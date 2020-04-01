@@ -10,36 +10,16 @@
         >
             <v-list nav dense>
                 <v-list-item-group>
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon>mdi-home</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Home</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon>$wotd</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Word of the Day</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon>$translator</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Translator</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon>$quiz</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Quiz Game</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon>mdi-logout</v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-title>Log out</v-list-item-title>
-                    </v-list-item>
+                    <template v-for="(item, index) in drawerItems">
+                        <v-list-item :key="index">
+                            <v-list-item-icon>
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-title>
+                                {{ item.title }}
+                            </v-list-item-title>
+                        </v-list-item>
+                    </template>
                 </v-list-item-group>
             </v-list>
         </v-navigation-drawer>
@@ -60,7 +40,14 @@ export default {
     data() {
         return {
             appTitle: 'Lingvino Admin',
-            drawer: false
+            drawer: false,
+            drawerItems: [
+                { title: 'Home', icon: 'mdi-home' },
+                { title: 'Word of the day', icon: '$wotd' },
+                { title: 'Translator', icon: '$translator' },
+                { title: 'Quiz game', icon: '$quiz' },
+                { title: 'Sign out', icon: 'mdi-logout' }
+            ]
         };
     }
 };
