@@ -1,3 +1,3 @@
 <template>
-    <img src="@/assets/quiz.svg" alt="quiz" />
+    <img src="/assets/quiz.svg" alt="quiz" />
 </template>

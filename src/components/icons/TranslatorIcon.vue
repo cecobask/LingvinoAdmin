@@ -1,3 +1,3 @@
 <template>
-    <img src="@/assets/translator.svg" alt="translator" />
+    <img src="/assets/translator.svg" alt="translator" />
 </template>

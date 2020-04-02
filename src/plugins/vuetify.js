@@ -10,15 +10,9 @@ Vue.use(Vuetify);
 export default new Vuetify({
     icons: {
         values: {
-            wotd: {
-                component: WOTDIcon
-            },
-            translator: {
-                component: TranslatorIcon
-            },
-            quiz: {
-                component: QuizIcon
-            }
+            wotd: { component: WOTDIcon },
+            translator: { component: TranslatorIcon },
+            quiz: { component: QuizIcon }
         }
     }
 });
