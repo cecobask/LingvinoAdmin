@@ -45,7 +45,7 @@ export default {
     name: 'AppNavigation',
     data() {
         return {
-            appTitle: 'Lingvino Admin',
+            appTitle: process.env.VUE_APP_TITLE,
             drawer: false,
             drawerItems: [
                 {

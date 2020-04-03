@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid fill-height class="home">
+    <v-container fluid fill-height>
         <v-row no-gutters>
             <v-col class="display-2 font-weight-bold white--text text-center">
                 Manage the following services:
@@ -7,22 +7,27 @@
         </v-row>
         <v-row no-gutters>
             <v-col v-for="service in services" :key="service" sm="6" md="3">
-                <v-card
-                    dark
-                    hover
-                    class="ma-auto my-3 pa-3"
-                    width="250"
-                    height="400"
-                >
-                    <v-img :src="service.icon" />
-                    <v-divider class="mt-3" />
-                    <v-card-title class="justify-center">
-                        {{ service.title }}
-                    </v-card-title>
-                    <v-card-text>
-                        {{ service.description }}
-                    </v-card-text>
-                </v-card>
+                <v-hover v-slot:default="{ hover }">
+                    <v-card
+                        dark
+                        class="ma-auto my-3 pa-5 card-color"
+                        width="300"
+                        height="420"
+                        :elevation="hover ? 20 : 5"
+                        :class="{ 'on-hover': hover }"
+                        style="cursor: pointer"
+                        :to="service.route"
+                    >
+                        <v-img :src="service.icon" />
+                        <v-divider class="mt-3" />
+                        <v-card-title class="justify-center font-weight-bold">
+                            {{ service.title }}
+                        </v-card-title>
+                        <v-card-text>
+                            {{ service.description }}
+                        </v-card-text>
+                    </v-card>
+                </v-hover>
             </v-col>
         </v-row>
     </v-container>
@@ -37,23 +42,27 @@ export default {
                 {
                     title: 'Word of the Day',
                     icon: '/assets/wotd.svg',
-                    description: 'Add new words. Manage existing ones.'
+                    description: 'Add new words. Manage existing ones.',
+                    route: '/wotd'
                 },
                 {
                     title: 'Translator',
                     icon: '/assets/translator.svg',
-                    description: 'TBA'
+                    description: 'TBA',
+                    route: '/translator'
                 },
                 {
                     title: 'Quiz Game',
                     icon: '/assets/quiz.svg',
                     description:
-                        'Add new quiz questions and topics. Manage existing ones.'
+                        'Add new quiz questions and topics. Manage existing ones.',
+                    route: '/quiz'
                 },
                 {
                     title: 'User Management',
                     icon: '/assets/user-management.svg',
-                    description: 'Revoke user access. Delete users.'
+                    description: 'Revoke user access. Delete users.',
+                    route: '/users'
                 }
             ]
         };
@@ -62,11 +71,7 @@ export default {
 </script>
 
 <style scoped>
-.home {
-    background-size: cover;
-    width: 100%;
-    height: 100%;
-    background: url('https://globalpartnersinhope.com/wp-content/uploads/2016/11/iStock_93232925_MEDIUM.jpg')
-        no-repeat center;
+.card-color {
+    background-color: rgba(38, 50, 56, 0.85) !important;
 }
 </style>
