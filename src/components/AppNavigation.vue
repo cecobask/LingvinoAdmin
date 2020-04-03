@@ -20,6 +20,14 @@
                             </v-list-item-title>
                         </v-list-item>
                     </template>
+                    <v-list-item @click="logout">
+                        <v-list-item-icon>
+                            <v-icon>mdi-logout-variant</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-title>
+                            Log out
+                        </v-list-item-title>
+                    </v-list-item>
                 </v-list-item-group>
             </v-list>
         </v-navigation-drawer>
@@ -35,7 +43,19 @@
                 </router-link>
             </v-toolbar-title>
             <v-spacer class="hidden-sm-and-down" />
-            <v-btn class="hidden-sm-and-down" to="/login" text>LOG IN</v-btn>
+            <v-btn
+                v-if="!userLoggedIn"
+                class="hidden-sm-and-down"
+                to="/login"
+                text
+            >
+                <v-icon class="pr-2">mdi-login-variant</v-icon>
+                Log in
+            </v-btn>
+            <v-btn text v-else class="hidden-sm-and-down" @click="logout">
+                <v-icon class="pr-2">mdi-logout-variant</v-icon>
+                Log out
+            </v-btn>
         </v-app-bar>
     </span>
 </template>
@@ -67,14 +87,21 @@ export default {
                     title: 'Quiz game',
                     icon: '$quiz',
                     route: '/quiz'
-                },
-                {
-                    title: 'Sign out',
-                    icon: 'mdi-logout',
-                    route: '/logout'
                 }
             ]
         };
+    },
+
+    methods: {
+        logout() {
+            this.$store.dispatch('logoutAction');
+        }
+    },
+
+    computed: {
+        userLoggedIn() {
+            return this.$store.getters.user;
+        }
     }
 };
 </script>
