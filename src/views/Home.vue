@@ -18,8 +18,14 @@
                         style="cursor: pointer"
                         :to="service.route"
                     >
-                        <v-img :src="service.icon" />
-                        <v-divider class="mt-3" />
+                        <v-avatar tile color="teal darken-2" size="260">
+                            <img
+                                :alt="service.title"
+                                :src="service.icon"
+                                class="pa-5"
+                            />
+                        </v-avatar>
+                        <v-divider class="mt-3 teal" />
                         <v-card-title class="justify-center font-weight-bold">
                             {{ service.title }}
                         </v-card-title>
