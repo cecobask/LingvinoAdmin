@@ -11,7 +11,7 @@
             <v-list nav dense>
                 <v-list-item-group>
                     <template v-for="(item, index) in drawerItems">
-                        <v-list-item :key="index">
+                        <v-list-item :key="index" :to="item.route">
                             <v-list-item-icon>
                                 <v-icon>{{ item.icon }}</v-icon>
                             </v-list-item-icon>
@@ -26,10 +26,16 @@
         <v-app-bar app color="teal darken-4" dark>
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
             <v-spacer class="hidden-md-and-up" />
-            <v-toolbar-title>{{ appTitle }}</v-toolbar-title>
+            <v-toolbar-title>
+                <router-link
+                    to="/"
+                    style="color: white; text-decoration: none; font-weight: bold"
+                >
+                    {{ appTitle }}
+                </router-link>
+            </v-toolbar-title>
             <v-spacer class="hidden-sm-and-down" />
-            <v-btn class="hidden-sm-and-down" text>LOG IN</v-btn>
-            <v-btn class="hidden-sm-and-down" text>REGISTER</v-btn>
+            <v-btn class="hidden-sm-and-down" to="/login" text>LOG IN</v-btn>
         </v-app-bar>
     </span>
 </template>
@@ -42,11 +48,31 @@ export default {
             appTitle: 'Lingvino Admin',
             drawer: false,
             drawerItems: [
-                { title: 'Home', icon: 'mdi-home' },
-                { title: 'Word of the day', icon: '$wotd' },
-                { title: 'Translator', icon: '$translator' },
-                { title: 'Quiz game', icon: '$quiz' },
-                { title: 'Sign out', icon: 'mdi-logout' }
+                {
+                    title: 'Home',
+                    icon: 'mdi-home',
+                    route: '/'
+                },
+                {
+                    title: 'Word of the day',
+                    icon: '$wotd',
+                    route: '/wotd'
+                },
+                {
+                    title: 'Translator',
+                    icon: '$translator',
+                    route: '/translator'
+                },
+                {
+                    title: 'Quiz game',
+                    icon: '$quiz',
+                    route: '/quiz'
+                },
+                {
+                    title: 'Sign out',
+                    icon: 'mdi-logout',
+                    route: '/logout'
+                }
             ]
         };
     }

@@ -47,7 +47,8 @@ export default {
                 {
                     title: 'Quiz Game',
                     icon: '/assets/quiz.svg',
-                    description: 'Add new quiz questions and topics. Manage existing ones.'
+                    description:
+                        'Add new quiz questions and topics. Manage existing ones.'
                 },
                 {
                     title: 'User Management',
