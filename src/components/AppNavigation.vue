@@ -1,17 +1,23 @@
 <template>
     <span>
         <v-navigation-drawer
-            color="teal darken-4"
             app
+            color="teal darken-4"
+            v-if="userLoggedIn"
             v-model="drawer"
-            absolute
+            disable-route-watcher
+            :mini-variant="$vuetify.breakpoint.smAndDown"
             temporary
             dark
         >
             <v-list nav dense>
                 <v-list-item-group>
-                    <template v-for="(item, index) in drawerItems">
-                        <v-list-item :key="index" :to="item.route">
+                    <template v-for="item in drawerItems">
+                        <v-list-item
+                            :key="item.route"
+                            :to="item.route"
+                            @click="drawer = false"
+                        >
                             <v-list-item-icon>
                                 <v-icon>{{ item.icon }}</v-icon>
                             </v-list-item-icon>
@@ -47,12 +53,19 @@
                 v-if="!userLoggedIn"
                 class="hidden-sm-and-down"
                 to="/login"
-                text
+                outlined
+                replace
             >
                 <v-icon class="pr-2">mdi-login-variant</v-icon>
                 Log in
             </v-btn>
-            <v-btn text v-else class="hidden-sm-and-down" @click="logout">
+            <v-btn
+                v-else
+                class="hidden-sm-and-down"
+                @click="logout"
+                outlined
+                replace
+            >
                 <v-icon class="pr-2">mdi-logout-variant</v-icon>
                 Log out
             </v-btn>
@@ -65,7 +78,7 @@ export default {
     name: 'AppNavigation',
     data() {
         return {
-            appTitle: process.env.VUE_APP_TITLE,
+            appTitle: 'Lingvino Admin',
             drawer: false,
             drawerItems: [
                 {
@@ -105,5 +118,3 @@ export default {
     }
 };
 </script>
-
-<style scoped></style>

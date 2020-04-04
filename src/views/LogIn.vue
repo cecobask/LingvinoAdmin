@@ -14,6 +14,7 @@
                             spellcheck="false"
                             label="Email"
                             color="teal darken-4"
+                            background-color="grey lighten-5"
                             prepend-inner-icon="mdi-account-circle"
                             :rules="rules.email"
                         />
@@ -24,6 +25,7 @@
                             :type="showPassword ? 'text' : 'password'"
                             label="Password"
                             color="teal darken-4"
+                            background-color="grey lighten-5"
                             prepend-inner-icon="mdi-lock"
                             :append-icon="
                                 showPassword ? 'mdi-eye' : 'mdi-eye-off'
@@ -32,6 +34,9 @@
                             :rules="rules.password"
                         />
                     </v-form>
+                    <p v-bind="authError" class="red--text" v-if="authError">
+                        {{ authError }}
+                    </p>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn
@@ -50,6 +55,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'LogIn',
     data() {
@@ -57,7 +63,7 @@ export default {
             showPassword: false,
             email: '',
             password: '',
-            valid: true,
+            valid: false,
             rules: {
                 email: [
                     v => !!v || 'E-mail is required',
@@ -72,10 +78,8 @@ export default {
         validate() {
             return this.$refs.form.validate();
         },
-        reset() {
+        clearForm() {
             this.$refs.form.reset();
-        },
-        resetValidation() {
             this.$refs.form.resetValidation();
         },
         login() {
@@ -84,11 +88,12 @@ export default {
                     email: this.email,
                     password: this.password
                 });
-                this.resetValidation();
-                this.reset();
+                this.clearForm();
             }
         }
-    }
+    },
+
+    computed: mapState(['authError'])
 };
 </script>
 

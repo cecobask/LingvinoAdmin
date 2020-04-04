@@ -6,7 +6,12 @@
             </v-col>
         </v-row>
         <v-row no-gutters>
-            <v-col v-for="service in services" :key="service" sm="6" md="3">
+            <v-col
+                v-for="service in services"
+                :key="service.route"
+                md="6"
+                lg="3"
+            >
                 <v-hover v-slot:default="{ hover }">
                     <v-card
                         dark

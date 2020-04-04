@@ -1,60 +1,50 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import firebase from 'firebase';
+import firebase from '@/firebase';
+import router from '@/router';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
         user: null,
-        status: null,
-        error: null
+        authError: null
     },
 
     mutations: {
         setUser(state, payload) {
             state.user = payload;
         },
-        removeUser(state) {
-            state.user = null;
-        },
-        setStatus(state, payload) {
-            state.status = payload;
-        },
-        setError(state, payload) {
-            state.error = payload;
+        setAuthError(state, payload) {
+            state.authError = payload;
         }
     },
 
     actions: {
         loginAction({ commit }, payload) {
-            firebase
-                .auth()
+            firebase.auth
                 .signInWithEmailAndPassword(payload.email, payload.password)
-                .then(res => {
+                .then(async res => {
                     commit('setUser', res.user.uid);
-                    commit('setStatus', 'success');
-                    commit('setError', null);
-                    console.log(res);
+                    commit('setAuthError', null);
+                    await router.replace('/');
                 })
                 .catch(err => {
-                    commit('setStatus', 'failure');
-                    commit('setError', err.message);
-                    console.log(err);
+                    if (err.code.startsWith('auth'))
+                        commit('setAuthError', err.message);
                 });
         },
         logoutAction({ commit }) {
-            firebase
-                .auth()
+            firebase.auth
                 .signOut()
-                .then(() => {
+                .then(async () => {
                     commit('setUser', null);
-                    commit('setStatus', 'success');
-                    commit('setError', null);
+                    commit('setAuthError', null);
+                    await router.replace('/login');
                 })
                 .catch(err => {
-                    commit('setStatus', 'failure');
-                    commit('setError', err.message);
+                    if (err.code.startsWith('auth'))
+                        commit('setAuthError', err.message);
                 });
         }
     },
@@ -63,11 +53,8 @@ export default new Vuex.Store({
         user(state) {
             return state.user;
         },
-        status(state) {
-            return state.status;
-        },
-        error(state) {
-            return state.error;
+        authError(state) {
+            return state.authError;
         }
     }
 });
