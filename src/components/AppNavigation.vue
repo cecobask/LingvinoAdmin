@@ -100,6 +100,11 @@ export default {
                     title: 'Quiz game',
                     icon: '$quiz',
                     route: '/quiz'
+                },
+                {
+                    title: 'User management',
+                    icon: '$userManagement',
+                    route: '/users'
                 }
             ]
         };
