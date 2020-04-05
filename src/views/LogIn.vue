@@ -88,6 +88,7 @@ export default {
                     email: this.email,
                     password: this.password
                 });
+                this.$root.$emit('authenticated', false);
                 this.clearForm();
             }
         }

@@ -115,6 +115,12 @@ export default {
         userLoggedIn() {
             return this.$store.getters.user;
         }
+    },
+
+    mounted() {
+        this.$root.$on('authenticated', bool => {
+            this.drawer = bool;
+        });
     }
 };
 </script>
