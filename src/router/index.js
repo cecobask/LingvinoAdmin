@@ -24,8 +24,8 @@ const routes = [
         name: 'Word of the Day',
         meta: {
             authRequired: true
-        }
-        // component: () => import('@/views/WordOfTheDay')
+        },
+        component: () => import('@/views/WordOfTheDay')
     },
     {
         path: '/translator',

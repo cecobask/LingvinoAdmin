@@ -3,7 +3,7 @@
         <v-navigation-drawer
             app
             color="teal darken-4"
-            v-if="userLoggedIn"
+            v-if="user"
             v-model="drawer"
             disable-route-watcher
             :mini-variant="$vuetify.breakpoint.smAndDown"
@@ -50,7 +50,7 @@
             </v-toolbar-title>
             <v-spacer class="hidden-sm-and-down" />
             <v-btn
-                v-if="!userLoggedIn"
+                v-if="!user"
                 class="hidden-sm-and-down"
                 to="/login"
                 outlined
@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     name: 'AppNavigation',
     data() {
@@ -116,11 +117,7 @@ export default {
         }
     },
 
-    computed: {
-        userLoggedIn() {
-            return this.$store.getters.user;
-        }
-    },
+    computed: mapState(['user']),
 
     mounted() {
         this.$root.$on('authenticated', bool => {

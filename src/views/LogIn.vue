@@ -34,7 +34,7 @@
                             :rules="rules.password"
                         />
                     </v-form>
-                    <p v-bind="authError" class="red--text" v-if="authError">
+                    <p class="red--text" v-if="authError">
                         {{ authError }}
                     </p>
                 </v-card-text>

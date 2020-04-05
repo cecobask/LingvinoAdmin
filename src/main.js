@@ -6,8 +6,10 @@ import vuetify from './plugins/vuetify';
 import '@babel/polyfill';
 import '@/firebase';
 import firebase from '@/firebase';
+import JSONView from 'vue-json-component';
 
 Vue.config.productionTip = false;
+Vue.use(JSONView);
 
 // Handle page reloads.
 let app;

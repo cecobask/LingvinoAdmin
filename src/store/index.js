@@ -8,7 +8,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         user: null,
-        authError: null
+        authError: null,
+        wotds: []
     },
 
     mutations: {
@@ -17,6 +18,9 @@ export default new Vuex.Store({
         },
         setAuthError(state, payload) {
             state.authError = payload;
+        },
+        setWotds(state, payload) {
+            state.wotds = payload;
         }
     },
 
@@ -46,6 +50,14 @@ export default new Vuex.Store({
                     if (err.code.startsWith('auth'))
                         commit('setAuthError', err.message);
                 });
+        },
+        fetchWotds({ commit }) {
+            firebase.database
+                .ref('/wordOfTheDay')
+                .once('value')
+                .then(snapshot => {
+                    commit('setWotds', snapshot.val());
+                });
         }
     },
 
@@ -55,6 +67,9 @@ export default new Vuex.Store({
         },
         authError(state) {
             return state.authError;
+        },
+        wotds(state) {
+            return state.wotds;
         }
     }
 });
