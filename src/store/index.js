@@ -9,7 +9,8 @@ export default new Vuex.Store({
     state: {
         user: null,
         authError: null,
-        pastWotds: []
+        pastWotds: [],
+        selectionWotds: []
     },
     
     mutations: {
@@ -21,6 +22,9 @@ export default new Vuex.Store({
         },
         setPastWotds(state, payload) {
             state.pastWotds = payload;
+        },
+        setSelectionWotds(state, payload) {
+            state.selectionWotds = payload;
         }
     },
     
@@ -53,43 +57,10 @@ export default new Vuex.Store({
         },
         fetchWotds({ commit }) {
             firebase.database
-                .ref('/wordOfTheDay/past')
+                .ref('/wordOfTheDay')
                 .once('value')
                 .then(snapshot => {
-                    const wordsSnap = snapshot.val();
-                    let pastWords = [
-                        {
-                            id: 'past',
-                            name: 'past',
-                            children: []
-                        }
-                    ];
-                    for (const date in wordsSnap) {
-                        if (Object.prototype.hasOwnProperty.call(wordsSnap,
-                            date)) {
-                            let word = {
-                                id: date,
-                                name: date,
-                                children: []
-                            };
-                            let values = Object.entries(wordsSnap[date]);
-                            values.forEach(val => {
-                                word.children.push({
-                                    id: `${date}/${val[0]}`,
-                                    name: val[0],
-                                    children: [
-                                        {
-                                            id: `${date}/${val[0]}`,
-                                            name: [val[1]]
-                                        }
-                                    ]
-                                });
-                            });
-                            pastWords[0].children.push(word);
-                        }
-                    }
-                    
-                    commit('setPastWotds', pastWords);
+                    commit('setPastWotds', getPastWotds(snapshot));
                 });
         }
     },
@@ -103,7 +74,46 @@ export default new Vuex.Store({
         },
         pastWotds(state) {
             return state.pastWotds;
+        },
+        selectionWotds(state) {
+            return state.selectionWotds;
         }
     }
 });
+
+function getPastWotds(snapshot) {
+    const pastWordsSnap = snapshot.val().past;
+    let pastWords = [
+        {
+            id: 'past',
+            name: 'past',
+            children: []
+        }
+    ];
+    for (const date in pastWordsSnap) {
+        if (Object.prototype.hasOwnProperty.call(pastWordsSnap,
+            date)) {
+            let word = {
+                id: date,
+                name: date,
+                children: []
+            };
+            let values = Object.entries(pastWordsSnap[date]);
+            values.forEach(val => {
+                word.children.push({
+                    id: `${date}/${val[0]}`,
+                    name: val[0],
+                    children: [
+                        {
+                            id: `${date}/${val[0]}`,
+                            name: [val[1]]
+                        }
+                    ]
+                });
+            });
+            pastWords[0].children.push(word);
+        }
+    }
+    return pastWords;
+}
 
