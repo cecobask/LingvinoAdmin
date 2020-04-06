@@ -9,9 +9,9 @@ export default new Vuex.Store({
     state: {
         user: null,
         authError: null,
-        wotds: []
+        pastWotds: []
     },
-
+    
     mutations: {
         setUser(state, payload) {
             state.user = payload;
@@ -19,11 +19,11 @@ export default new Vuex.Store({
         setAuthError(state, payload) {
             state.authError = payload;
         },
-        setWotds(state, payload) {
-            state.wotds = payload;
+        setPastWotds(state, payload) {
+            state.pastWotds = payload;
         }
     },
-
+    
     actions: {
         loginAction({ commit }, payload) {
             firebase.auth
@@ -53,14 +53,47 @@ export default new Vuex.Store({
         },
         fetchWotds({ commit }) {
             firebase.database
-                .ref('/wordOfTheDay')
+                .ref('/wordOfTheDay/past')
                 .once('value')
                 .then(snapshot => {
-                    commit('setWotds', snapshot.val());
+                    const wordsSnap = snapshot.val();
+                    let pastWords = [
+                        {
+                            id: 'past',
+                            name: 'past',
+                            children: []
+                        }
+                    ];
+                    for (const date in wordsSnap) {
+                        if (Object.prototype.hasOwnProperty.call(wordsSnap,
+                            date)) {
+                            let word = {
+                                id: date,
+                                name: date,
+                                children: []
+                            };
+                            let values = Object.entries(wordsSnap[date]);
+                            values.forEach(val => {
+                                word.children.push({
+                                    id: `${date}/${val[0]}`,
+                                    name: val[0],
+                                    children: [
+                                        {
+                                            id: `${date}/${val[0]}`,
+                                            name: [val[1]]
+                                        }
+                                    ]
+                                });
+                            });
+                            pastWords[0].children.push(word);
+                        }
+                    }
+                    
+                    commit('setPastWotds', pastWords);
                 });
         }
     },
-
+    
     getters: {
         user(state) {
             return state.user;
@@ -68,8 +101,9 @@ export default new Vuex.Store({
         authError(state) {
             return state.authError;
         },
-        wotds(state) {
-            return state.wotds;
+        pastWotds(state) {
+            return state.pastWotds;
         }
     }
 });
+

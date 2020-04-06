@@ -6,32 +6,39 @@
             </v-col>
         </v-row>
         <v-row no-gutters>
-            <v-col>
-                <json-view :data="wotds" v-on:selected="itemSelected" />
+            <v-col class="ma-auto" sm="12" md="9" lg="9">
+                <v-treeview class="rounded white pa-3 my-3" v-model="selection" selected-color="teal"
+                            selection-type="independent" open-on-click rounded selectable return-object hoverable
+                            :items="pastWotds"></v-treeview>
             </v-col>
         </v-row>
     </v-container>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-export default {
-    name: 'WordOfTheDay',
+    import { mapState } from 'vuex';
 
-    mounted() {
-        this.$store.dispatch('fetchWotds');
-    },
+    export default {
+        name: 'WordOfTheDay',
 
-    computed: mapState(['wotds']),
+        data() {
+            return {
+                selection: []
+            };
+        },
 
-    methods: {
-        itemSelected(key, value, path) {
-            console.log(key);
-            console.log(value);
-            console.log(path);
-        }
-    }
-};
+        mounted() {
+            this.$store.dispatch('fetchWotds');
+        },
+
+        computed: mapState(['pastWotds']),
+
+        methods: {}
+    };
 </script>
 
-<style scoped></style>
+<style scoped>
+    .rounded {
+        border-radius: 10px;
+    }
+</style>
