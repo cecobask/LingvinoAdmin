@@ -103,10 +103,12 @@ function getPastWotds(snapshot) {
                 word.children.push({
                     id: `${date}/${val[0]}`,
                     name: val[0],
+                    value: val[1],
                     children: [
                         {
                             id: `${date}/${val[0]}`,
-                            name: [val[1]]
+                            name: [val[1]],
+                            value: val[1]
                         }
                     ]
                 });
