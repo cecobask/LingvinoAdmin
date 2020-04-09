@@ -62,6 +62,7 @@
 
         mounted() {
             this.$store.dispatch('fetchWotds');
+            this.$loading.show();
         },
 
         methods: {
@@ -78,6 +79,8 @@
                                     .set(updatedValue);
                             }
                         }
+                        this.$refs.wotdTree.snackbar.visibility = true;
+                        this.$refs.wotdTree.snackbar.text = 'Successfully updated the record/s.';
                         this.$store.dispatch('fetchWotds');
                         break;
                     }

@@ -87,6 +87,7 @@ function getSelectionWotds(snapshot) {
             {
                 id: `selection/${word.key}`,
                 name: word.val(),
+                label: 'word',
                 value: word.val()
             }
         );

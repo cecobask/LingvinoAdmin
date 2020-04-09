@@ -96,7 +96,7 @@
                                                 <v-card-actions>
                                                     <v-btn dark color="teal"
                                                            class="ma-auto"
-                                                           @click="submitForm"
+                                                           @click="updateRecords"
                                                     >
                                                         Save
                                                     </v-btn>
@@ -166,10 +166,9 @@
                 this.$set(this.editDialog, this.clickedItem.id, false);
                 this.$set(this.actionMenu, this.clickedItem.id, false);
             },
-            submitForm() {
+            updateRecords() {
                 this.$emit('action',{ action: 'update', data: this.clickedItem })
                 this.closeDialog()
-                this.snackbar.visibility = true;
             },
             insertRecord() {
                 this.$emit('action', { action: 'insert-dialog' })
