@@ -17,6 +17,12 @@
                         </v-icon>
                         <v-icon class="mx-2" @click="triggerMultiSelect">mdi-clipboard-check-multiple</v-icon>
                     </v-toolbar>
+                    <v-snackbar v-model="snackbar.visibility" multi-line>
+                        {{ snackbar.text }}
+                        <v-btn color="pink" text @click="snackbar.visibility = false">
+                            Close
+                        </v-btn>
+                    </v-snackbar>
                     <v-card-text>
                         <v-treeview v-model="selection"
                                     selected-color="teal"
@@ -29,14 +35,15 @@
                                     :items="data"
                         >
                             <template v-slot:append="{ item }">
-                                <v-menu v-model="actionMenu[item.name]">
+                                <v-menu v-model="actionMenu[item.id]">
                                     <template v-if="item.children" v-slot:activator="{ on }">
                                         <v-btn icon v-on="on" @click="clickedItem = item">
                                             <v-icon>mdi-dots-vertical</v-icon>
                                         </v-btn>
                                     </template>
                                     <v-list>
-                                        <v-dialog v-model="editDialog[item.id]" persistent scrollable max-width="600">
+                                        <v-dialog v-if="clickedItem" v-model="editDialog[item.id]" persistent scrollable
+                                                  max-width="600">
                                             <template v-slot:activator="{ on }">
                                                 <v-list-item v-for="menuItem in menuItems"
                                                              :key="menuItem.title"
@@ -54,7 +61,7 @@
                                             <v-card>
                                                 <v-toolbar dark color="teal darken-3">
                                                     <v-spacer/>
-                                                    <v-toolbar-title class="font-weight-bold">{{item.id}}
+                                                    <v-toolbar-title class="font-weight-bold">{{item.name}}
                                                     </v-toolbar-title>
                                                     <v-spacer/>
                                                     <v-btn icon dark @click="closeDialog()">
@@ -63,14 +70,23 @@
                                                 </v-toolbar>
                                                 <v-card-text>
                                                     <v-container>
-                                                        <v-row v-for="field in item.children" :key="field.id">
-                                                            <v-col>
-                                                                <v-text-field :label="field.id"
+                                                        <v-row v-for="(field, index) in item.children" :key="field.id">
+                                                            <v-col v-if="clickedItem.children[index]">
+                                                                <v-text-field v-if="clickedItem.children[index].label"
+                                                                              :label="field.label"
                                                                               outlined
                                                                               spellcheck="false"
                                                                               type="text"
                                                                               color="teal darken-4"
-                                                                              :value="field.value"
+                                                                              v-model="clickedItem.children[index].value"
+                                                                ></v-text-field>
+                                                                <v-text-field v-else
+                                                                              :label="field.name"
+                                                                              outlined
+                                                                              spellcheck="false"
+                                                                              type="text"
+                                                                              color="teal darken-4"
+                                                                              v-model="clickedItem.children[index].value"
                                                                 ></v-text-field>
                                                             </v-col>
                                                         </v-row>
@@ -78,7 +94,10 @@
                                                 </v-card-text>
                                                 <v-divider/>
                                                 <v-card-actions>
-                                                    <v-btn dark color="teal" class="ma-auto" @click="closeDialog()">
+                                                    <v-btn dark color="teal"
+                                                           class="ma-auto"
+                                                           @click="submitForm"
+                                                    >
                                                         Save
                                                     </v-btn>
                                                 </v-card-actions>
@@ -108,6 +127,10 @@
                 editDialog: {},
                 clickedItem: null,
                 actionMenu: {},
+                snackbar: {
+                    visibility: false,
+                    text: 'Success'
+                },
                 menuItems: [
                     {
                         title: 'Delete',
@@ -122,9 +145,20 @@
         },
 
         methods: {
+            // eslint-disable-next-line no-unused-vars
             performAction(action, selection) {
-                console.log(action);
-                console.log(selection);
+                switch (action) {
+                    case 'edit': {
+                        console.log('edit');
+                        break;
+                    }
+                    case 'add':
+                        console.log('add');
+                        break;
+                    case 'delete':
+                        console.log('delete');
+                        break;
+                }
             },
             triggerMultiSelect() {
                 this.multiSelect = !this.multiSelect;
@@ -133,7 +167,12 @@
             },
             closeDialog() {
                 this.$set(this.editDialog, this.clickedItem.id, false);
-                this.$set(this.actionMenu, this.clickedItem.name, false);
+                this.$set(this.actionMenu, this.clickedItem.id, false);
+            },
+            submitForm() {
+                this.$emit('action',{ action: 'update', data: this.clickedItem })
+                this.closeDialog()
+                this.snackbar.visibility = true;
             }
         }
     };

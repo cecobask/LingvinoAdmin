@@ -82,7 +82,7 @@ export default new Vuex.Store({
 });
 
 function getPastWotds(snapshot) {
-    const pastWordsSnap = snapshot.val().past;
+    const pastWordsSnap = snapshot.child('past').val();
     let pastWords = [
         {
             id: 'past',
@@ -91,23 +91,24 @@ function getPastWotds(snapshot) {
         }
     ];
     for (const date in pastWordsSnap) {
-        if (Object.prototype.hasOwnProperty.call(pastWordsSnap,
-            date)) {
+        if (Object.prototype.hasOwnProperty.call(pastWordsSnap, date)) {
             let word = {
-                id: date,
+                id: `past/${date}`,
                 name: date,
+                value: JSON.stringify(snapshot.child(`past/${date}`)),
                 children: []
             };
             let values = Object.entries(pastWordsSnap[date]);
             values.forEach(val => {
                 word.children.push({
-                    id: `${date}/${val[0]}`,
+                    id: `past/${date}/${val[0]}`,
                     name: val[0],
                     value: val[1],
                     children: [
                         {
-                            id: `${date}/${val[0]}`,
-                            name: [val[1]],
+                            id: `past/${date}/${val[0]}/last`,
+                            name: val[1],
+                            label: val[0],
                             value: val[1]
                         }
                     ]
