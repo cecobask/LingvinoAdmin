@@ -9,10 +9,10 @@
                             {{ title }}
                         </v-toolbar-title>
                         <v-spacer/>
-                        <v-icon class="mx-2" @click="performAction('add')">
+                        <v-icon class="mx-2" @click="insertRecord">
                             mdi-plus-box
                         </v-icon>
-                        <v-icon class="mx-2" v-if="selection.length" @click="performAction('delete', selection)">
+                        <v-icon class="mx-2" v-if="selection.length" @click="deleteRecords">
                             mdi-delete
                         </v-icon>
                         <v-icon class="mx-2" @click="triggerMultiSelect">mdi-clipboard-check-multiple</v-icon>
@@ -152,9 +152,6 @@
                         console.log('edit');
                         break;
                     }
-                    case 'add':
-                        console.log('add');
-                        break;
                     case 'delete':
                         console.log('delete');
                         break;
@@ -173,6 +170,12 @@
                 this.$emit('action',{ action: 'update', data: this.clickedItem })
                 this.closeDialog()
                 this.snackbar.visibility = true;
+            },
+            insertRecord() {
+                this.$emit('action', { action: 'insert-dialog' })
+            },
+            deleteRecords() {
+                this.$emit('action', { action: 'delete', data: this.selection })
             }
         }
     };

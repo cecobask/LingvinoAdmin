@@ -86,8 +86,8 @@ function getSelectionWotds(snapshot) {
         wordsSelection.children.push(
             {
                 id: `selection/${word.key}`,
-                name: word.key,
-                value: word.key
+                name: word.val(),
+                value: word.val()
             }
         );
     });
