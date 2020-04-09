@@ -9,8 +9,7 @@ export default new Vuex.Store({
     state: {
         user: null,
         authError: null,
-        pastWotds: [],
-        selectionWotds: []
+        wotds: []
     },
     
     mutations: {
@@ -20,11 +19,8 @@ export default new Vuex.Store({
         setAuthError(state, payload) {
             state.authError = payload;
         },
-        setPastWotds(state, payload) {
-            state.pastWotds = payload;
-        },
-        setSelectionWotds(state, payload) {
-            state.selectionWotds = payload;
+        setWotds(state, payload) {
+            state.wotds = payload;
         }
     },
     
@@ -60,7 +56,7 @@ export default new Vuex.Store({
                 .ref('/wordOfTheDay')
                 .once('value')
                 .then(snapshot => {
-                    commit('setPastWotds', getPastWotds(snapshot));
+                    commit('setWotds', [getPastWotds(snapshot), getSelectionWotds(snapshot)]);
                 });
         }
     },
@@ -72,24 +68,41 @@ export default new Vuex.Store({
         authError(state) {
             return state.authError;
         },
-        pastWotds(state) {
-            return state.pastWotds;
-        },
-        selectionWotds(state) {
-            return state.selectionWotds;
+        wotds(state) {
+            return state.wotds;
         }
     }
 });
 
+function getSelectionWotds(snapshot) {
+    const wordsSelectionSnap = snapshot.child('selection');
+    const wordsSelection =
+            {
+                id: 'selection',
+                name: 'selection',
+                children: []
+            };
+    wordsSelectionSnap.forEach(word => {
+        wordsSelection.children.push(
+            {
+                id: `selection/${word.key}`,
+                name: word.key,
+                value: word.key
+            }
+        );
+    });
+    
+    return wordsSelection;
+}
+
 function getPastWotds(snapshot) {
     const pastWordsSnap = snapshot.child('past').val();
-    let pastWords = [
-        {
-            id: 'past',
-            name: 'past',
-            children: []
-        }
-    ];
+    let pastWords =
+            {
+                id: 'past',
+                name: 'past',
+                children: []
+            };
     for (const date in pastWordsSnap) {
         if (Object.prototype.hasOwnProperty.call(pastWordsSnap, date)) {
             let word = {
@@ -114,7 +127,7 @@ function getPastWotds(snapshot) {
                     ]
                 });
             });
-            pastWords[0].children.push(word);
+            pastWords.children.push(word);
         }
     }
     return pastWords;

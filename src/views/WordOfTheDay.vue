@@ -1,5 +1,5 @@
 <template>
-    <tree-view :data="pastWotds" @action="performAction" :title="title" :icon="icon"/>
+    <tree-view :data="wotds" @action="performAction" :title="title" :icon="icon"/>
 </template>
 
 <script>
@@ -10,7 +10,7 @@
     export default {
         name: 'WordOfTheDay',
         components: { TreeView },
-        computed: mapState(['pastWotds']),
+        computed: mapState(['wotds']),
 
         data() {
             return {
