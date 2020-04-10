@@ -62,12 +62,10 @@
 
         mounted() {
             this.$store.dispatch('fetchWotds');
-            this.$loading.show();
         },
 
         methods: {
             performAction({ action, data }) {
-                console.log(action);
                 switch (action) {
                     case 'update': {
                         for (const child in data.children) {
@@ -95,7 +93,7 @@
                         this.$refs.wotdTree.snackbar.visibility = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully inserted a new WOTD selection entry.';
                         this.wotdNew = '';
-                        this.$store.dispatch('fetchWotds');
+                        this.$store.dispatch('fetchWotds')
                         break;
                     }
                     case 'delete': {
@@ -107,7 +105,7 @@
                         });
                         this.$refs.wotdTree.snackbar.visibility = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully deleted selection.';
-                        this.$store.dispatch('fetchWotds');
+                        this.$store.dispatch('fetchWotds')
                         break;
                     }
                 }

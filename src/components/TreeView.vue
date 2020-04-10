@@ -5,26 +5,36 @@
                 <v-card>
                     <v-toolbar color="blue-grey darken-3" dark flat>
                         <v-icon class="mx-2">{{ icon }}</v-icon>
-                        <v-toolbar-title>
-                            {{ title }}
-                        </v-toolbar-title>
+                        <v-toolbar-title>{{ title }}</v-toolbar-title>
                         <v-spacer/>
-                        <v-icon class="mx-2" @click="insertRecord">
-                            mdi-plus-box
-                        </v-icon>
-                        <v-icon class="mx-2" v-if="selection.length" @click="deleteRecords">
-                            mdi-delete
-                        </v-icon>
+                        <v-icon class="mx-2" @click="expanded = []">mdi-collapse-all</v-icon>
                         <v-icon class="mx-2" @click="triggerMultiSelect">mdi-clipboard-check-multiple</v-icon>
+                        <v-divider class="mx-5 grey" vertical/>
+                        <v-icon class="mx-2" @click="insertRecord">mdi-plus-box</v-icon>
+                        <v-icon class="mx-2" v-if="selection.length" @click="deleteRecords">mdi-delete</v-icon>
+                        <v-icon class="mx-2" @click="search.visible = !search.visible">mdi-magnify</v-icon>
                     </v-toolbar>
-                    <v-snackbar v-model="snackbar.visibility" multi-line>
+                    <v-snackbar v-model="snackbar.visible" multi-line>
                         {{ snackbar.text }}
-                        <v-btn color="pink" text @click="snackbar.visibility = false">
+                        <v-btn color="pink" text @click="snackbar.visible = false">
                             Close
                         </v-btn>
                     </v-snackbar>
                     <v-card-text>
+                        <v-text-field
+                                v-model="search.text"
+                                v-if="search.visible"
+                                label="Search the database..."
+                                flat
+                                solo-inverted
+                                hide-details
+                                clearable
+                                clear-icon="mdi-close-circle-outline"
+                                class="mb-3"
+                        ></v-text-field>
                         <v-treeview v-model="selection"
+                                    :open="expanded"
+                                    @update:open="handleExpanded"
                                     selected-color="teal"
                                     selection-type="independent"
                                     open-on-click
@@ -33,6 +43,9 @@
                                     return-object
                                     hoverable
                                     :items="data"
+                                    :search="search.text"
+                                    class="overflow-y-auto"
+                                    style="max-height: 70vh"
                         >
                             <template v-slot:append="{ item }">
                                 <v-menu v-model="actionMenu[item.id]">
@@ -48,7 +61,7 @@
                                                 <v-list-item v-for="menuItem in menuItems"
                                                              :key="menuItem.title"
                                                              v-on="menuItem.title === 'Edit' ? on : ''"
-                                                             @click="performAction(menuItem.title.toLowerCase(), item)"
+                                                             @click="menuItem.title === 'Delete' ? deleteRecords(item) : ''"
                                                 >
                                                     <v-list-item-icon class="mx-0">
                                                         <v-icon>{{menuItem.icon}}</v-icon>
@@ -126,9 +139,14 @@
                 multiDelete: false,
                 editDialog: {},
                 clickedItem: null,
+                expanded: [],
+                search: {
+                    visible: false,
+                    text: null
+                },
                 actionMenu: {},
                 snackbar: {
-                    visibility: false,
+                    visible: false,
                     text: 'Success'
                 },
                 menuItems: [
@@ -145,18 +163,6 @@
         },
 
         methods: {
-            // eslint-disable-next-line no-unused-vars
-            performAction(action, selection) {
-                switch (action) {
-                    case 'edit': {
-                        console.log('edit');
-                        break;
-                    }
-                    case 'delete':
-                        console.log('delete');
-                        break;
-                }
-            },
             triggerMultiSelect() {
                 this.multiSelect = !this.multiSelect;
                 this.multiDelete = this.multiSelect;
@@ -173,8 +179,11 @@
             insertRecord() {
                 this.$emit('action', { action: 'insert-dialog' })
             },
-            deleteRecords() {
-                this.$emit('action', { action: 'delete', data: this.selection })
+            deleteRecords(record) {
+                this.$emit('action', { action: 'delete', data: record ? [record] : this.selection })
+            },
+            handleExpanded(expanded) {
+                this.expanded = expanded;
             }
         }
     };

@@ -26,37 +26,48 @@ export default new Vuex.Store({
     
     actions: {
         loginAction({ commit }, payload) {
+            const loader = Vue.$loading.show();
             firebase.auth
                 .signInWithEmailAndPassword(payload.email, payload.password)
                 .then(async res => {
                     commit('setUser', res.user.uid);
                     commit('setAuthError', null);
                     await router.replace('/');
+                    loader.hide();
                 })
                 .catch(err => {
+                    loader.hide();
                     if (err.code.startsWith('auth'))
                         commit('setAuthError', err.message);
                 });
         },
         logoutAction({ commit }) {
+            const loader = Vue.$loading.show();
             firebase.auth
                 .signOut()
                 .then(async () => {
                     commit('setUser', null);
                     commit('setAuthError', null);
                     await router.replace('/login');
+                    loader.hide();
                 })
                 .catch(err => {
+                    loader.hide();
                     if (err.code.startsWith('auth'))
                         commit('setAuthError', err.message);
                 });
         },
         fetchWotds({ commit }) {
+            const loader = Vue.$loading.show();
             firebase.database
                 .ref('/wordOfTheDay')
                 .once('value')
                 .then(snapshot => {
-                    commit('setWotds', [getPastWotds(snapshot), getSelectionWotds(snapshot)]);
+                    loader.hide();
+                    commit(
+                        'setWotds',
+                        [getPastWotds(snapshot), getSelectionWotds(snapshot)].filter(Boolean)
+                    );
                 });
         }
     },
@@ -93,7 +104,7 @@ function getSelectionWotds(snapshot) {
         );
     });
     
-    return wordsSelection;
+    return wordsSelection.children.length ? wordsSelection : null;
 }
 
 function getPastWotds(snapshot) {
@@ -131,6 +142,6 @@ function getPastWotds(snapshot) {
             pastWords.children.push(word);
         }
     }
-    return pastWords;
+    return pastWords.children.length ? pastWords : null;
 }
 
