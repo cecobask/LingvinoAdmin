@@ -88,11 +88,11 @@ export default new Vuex.Store({
 function getSelectionWotds(snapshot) {
     const wordsSelectionSnap = snapshot.child('selection');
     const wordsSelection =
-            {
-                id: 'selection',
-                name: 'selection',
-                children: []
-            };
+              {
+                  id: 'selection',
+                  name: 'selection',
+                  children: []
+              };
     wordsSelectionSnap.forEach(word => {
         wordsSelection.children.push(
             {
@@ -142,6 +142,15 @@ function getPastWotds(snapshot) {
             pastWords.children.push(word);
         }
     }
+    
+    pastWords.children.sort((a, b) => {
+            const dateStrA = a.name.split('-');
+            const dateStrB = b.name.split('-');
+            return new Date(dateStrA[2], dateStrA[1], dateStrA[0])
+                   - new Date(dateStrB[2], dateStrB[1], dateStrB[0]);
+        })
+        .reverse();
+    
     return pastWords.children.length ? pastWords : null;
 }
 
