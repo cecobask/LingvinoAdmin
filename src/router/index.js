@@ -40,8 +40,8 @@ const routes = [
         name: 'Quiz Game',
         meta: {
             authRequired: true
-        }
-        // component: () => import('@/views/QuizGame')
+        },
+        component: () => import('@/views/Quiz')
     },
     {
         path: '/users',

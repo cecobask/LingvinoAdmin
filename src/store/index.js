@@ -9,7 +9,8 @@ export default new Vuex.Store({
     state: {
         user: null,
         authError: null,
-        wotds: []
+        wotds: [],
+        quizData: []
     },
     
     mutations: {
@@ -21,6 +22,9 @@ export default new Vuex.Store({
         },
         setWotds(state, payload) {
             state.wotds = payload;
+        },
+        setQuizData(state, payload) {
+            state.quizData = payload;
         }
     },
     
@@ -66,8 +70,16 @@ export default new Vuex.Store({
                     loader.hide();
                     commit(
                         'setWotds',
-                        [getPastWotds(snapshot), getSelectionWotds(snapshot)].filter(Boolean)
+                        [formatPastWotds(snapshot), formatSelectionWotds(snapshot)].filter(Boolean)
                     );
+                });
+        },
+        fetchQuizData({ commit }) {
+            firebase.database
+                .ref('quizGame/topics')
+                .once('value')
+                .then(snapshot => {
+                    commit('setQuizData', formatQuizData(snapshot))
                 });
         }
     },
@@ -85,7 +97,56 @@ export default new Vuex.Store({
     }
 });
 
-function getSelectionWotds(snapshot) {
+function formatQuizData(snapshot) {
+    const topics = []
+    snapshot.forEach(topicSnapshot => {
+        const topic = {
+            id: topicSnapshot.key,
+            name: topicSnapshot.key,
+            value: JSON.stringify(snapshot.child(topicSnapshot.key)),
+            children: []
+        }
+        topicSnapshot.forEach(languageSnapshot => {
+            const languageRef = `${topic.id}/${languageSnapshot.key}`;
+            const lang = {
+                id: languageRef,
+                name: languageSnapshot.key,
+                value: JSON.stringify(snapshot.child(languageRef)),
+                children: []
+            }
+            topic.children.push(lang);
+            languageSnapshot.forEach(questionSnapshot => {
+                const questionRef = `${lang.id}/${questionSnapshot.key}`;
+                const question = {
+                    id: questionRef,
+                    name: questionSnapshot.key,
+                    value: JSON.stringify(snapshot.child(questionRef)),
+                    children: []
+                }
+                lang.children.push(question);
+                questionSnapshot.forEach(answersSnapshot => {
+                    const answerRef = `${question.id}/${answersSnapshot.key}`;
+                    const answers = {
+                        id: answerRef,
+                        name: answersSnapshot.key,
+                        value: answersSnapshot.val(),
+                        children: [{
+                            id: `${answerRef}/last`,
+                            name: answersSnapshot.val(),
+                            label: answersSnapshot.key,
+                            value: answersSnapshot.val()
+                        }]
+                    }
+                    question.children.push(answers)
+                })
+            })
+        })
+        topics.push(topic);
+    })
+    return topics;
+}
+
+function formatSelectionWotds(snapshot) {
     const wordsSelectionSnap = snapshot.child('selection');
     const wordsSelection =
               {
@@ -107,7 +168,7 @@ function getSelectionWotds(snapshot) {
     return wordsSelection.children.length ? wordsSelection : null;
 }
 
-function getPastWotds(snapshot) {
+function formatPastWotds(snapshot) {
     const pastWordsSnap = snapshot.child('past').val();
     let pastWords =
             {
