@@ -1,11 +1,20 @@
 <template>
-    <tree-view
-            :data="quizData"
-            @action="performAction"
-            :title="title"
-            :icon="icon"
-            ref="quizTree"
-    />
+    <v-content>
+        <tree-view
+                :data="quizData.formatted"
+                @action="performAction"
+                :title="title"
+                :icon="icon"
+                ref="quizTree"
+        />
+        <vue-json-pretty
+                :data="quizData.raw"
+                :deep="1"
+                :show-length="true"
+                :highlight-mouseover-node="true"
+                :collapsed-on-click-brackets="true"
+        />
+    </v-content>
 </template>
 
 <script>
@@ -13,10 +22,14 @@
     import { mapState } from 'vuex';
     import firebase from '@/firebase';
     import { hasJsonStructure } from '@/helpers';
+    import VueJsonPretty from 'vue-json-pretty';
 
     export default {
         name: 'Quiz',
-        components: { TreeView },
+        components: {
+            TreeView,
+            VueJsonPretty
+        },
         computed: mapState(['quizData']),
 
         data() {
@@ -44,7 +57,7 @@
                                     .set(updatedValue);
                             }
                         }
-                        this.$refs.quizTree.snackbar.visibility = true;
+                        this.$refs.quizTree.snackbar.visible = true;
                         this.$refs.quizTree.snackbar.text = 'Successfully updated the record/s.';
                         this.$store.dispatch('fetchQuizData');
                         break;
@@ -70,7 +83,7 @@
                                 .child(id)
                                 .remove();
                         });
-                        this.$refs.quizTree.snackbar.visibility = true;
+                        this.$refs.quizTree.snackbar.visible = true;
                         this.$refs.quizTree.snackbar.text = 'Successfully deleted selection.';
                         this.$store.dispatch('fetchQuizData');
                         break;

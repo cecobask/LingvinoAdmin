@@ -34,7 +34,7 @@
                         </v-tooltip>
                         <v-tooltip top color="success" v-if="selection.length">
                             <template #activator="{ on }">
-                                <v-icon class="mx-2" @click="deleteRecords" v-on="on">
+                                <v-icon class="mx-2" @click="performAction({ action: 'deleteRecords' })" v-on="on">
                                     mdi-delete
                                 </v-icon>
                             </template>
@@ -83,76 +83,7 @@
                                     style="max-height: 69vh"
                         >
                             <template v-slot:append="{ item }">
-                                <v-menu v-model="actionMenu[item.id]">
-                                    <template v-if="item.children" v-slot:activator="{ on }">
-                                        <v-btn icon v-on="on" @click="clickedItem = item">
-                                            <v-icon>mdi-dots-vertical</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <v-list>
-                                        <v-dialog v-if="clickedItem" v-model="editDialog[item.id]" persistent scrollable
-                                                  max-width="600">
-                                            <template v-slot:activator="{ on }">
-                                                <v-list-item v-for="menuItem in menuItems"
-                                                             :key="menuItem.title"
-                                                             v-on="menuItem.title === 'Edit' ? on : ''"
-                                                             @click="menuItem.title === 'Delete' ? deleteRecords(item) : ''"
-                                                >
-                                                    <v-list-item-icon class="mx-0">
-                                                        <v-icon>{{menuItem.icon}}</v-icon>
-                                                    </v-list-item-icon>
-                                                    <v-list-item-title class="ps-2">{{menuItem.title}}
-                                                    </v-list-item-title>
-                                                </v-list-item>
-                                            </template>
-
-                                            <v-card>
-                                                <v-toolbar dark color="teal darken-3">
-                                                    <v-spacer/>
-                                                    <v-toolbar-title class="font-weight-bold">{{item.name}}
-                                                    </v-toolbar-title>
-                                                    <v-spacer/>
-                                                    <v-btn icon dark @click="closeDialog()">
-                                                        <v-icon>mdi-close</v-icon>
-                                                    </v-btn>
-                                                </v-toolbar>
-                                                <v-card-text>
-                                                    <v-container>
-                                                        <v-row v-for="(field, index) in item.children" :key="field.id">
-                                                            <v-col v-if="clickedItem.children[index]">
-                                                                <v-text-field v-if="clickedItem.children[index].label"
-                                                                              :label="field.label"
-                                                                              outlined
-                                                                              spellcheck="false"
-                                                                              type="text"
-                                                                              color="teal darken-4"
-                                                                              v-model="clickedItem.children[index].value"
-                                                                ></v-text-field>
-                                                                <v-text-field v-else
-                                                                              :label="field.name"
-                                                                              outlined
-                                                                              spellcheck="false"
-                                                                              type="text"
-                                                                              color="teal darken-4"
-                                                                              v-model="clickedItem.children[index].value"
-                                                                ></v-text-field>
-                                                            </v-col>
-                                                        </v-row>
-                                                    </v-container>
-                                                </v-card-text>
-                                                <v-divider/>
-                                                <v-card-actions>
-                                                    <v-btn dark color="teal"
-                                                           class="ma-auto"
-                                                           @click="updateRecords"
-                                                    >
-                                                        Save
-                                                    </v-btn>
-                                                </v-card-actions>
-                                            </v-card>
-                                        </v-dialog>
-                                    </v-list>
-                                </v-menu>
+                                <tree-view-content :item="item" @crud="performAction"/>
                             </template>
                         </v-treeview>
                     </v-card-text>
@@ -163,8 +94,11 @@
 </template>
 
 <script>
+    import TreeViewContent from '@/components/TreeViewContent';
+
     export default {
         name: 'TreeView',
+        components: { TreeViewContent },
         props: ['data', 'title', 'icon'],
 
         data() {
@@ -172,28 +106,15 @@
                 selection: [],
                 multiSelect: false,
                 multiDelete: false,
-                editDialog: {},
-                clickedItem: null,
                 expanded: [],
                 search: {
                     visible: false,
                     text: null
                 },
-                actionMenu: {},
                 snackbar: {
                     visible: false,
                     text: 'Success'
-                },
-                menuItems: [
-                    {
-                        title: 'Delete',
-                        icon: 'mdi-delete'
-                    },
-                    {
-                        title: 'Edit',
-                        icon: 'mdi-square-edit-outline'
-                    }
-                ]
+                }
             };
         },
 
@@ -203,22 +124,27 @@
                 this.multiDelete = this.multiSelect;
                 this.selection = [];
             },
-            closeDialog() {
-                this.$set(this.editDialog, this.clickedItem.id, false);
-                this.$set(this.actionMenu, this.clickedItem.id, false);
-            },
-            updateRecords() {
-                this.$emit('action',{ action: 'update', data: this.clickedItem })
-                this.closeDialog()
-            },
-            insertRecord() {
-                this.$emit('action', { action: 'insert-dialog' })
-            },
-            deleteRecords(record) {
-                this.$emit('action', { action: 'delete', data: record ? [record] : this.selection })
-            },
             handleExpanded(expanded) {
                 this.expanded = expanded;
+            },
+            performAction({ action, data }) {
+                switch (action) {
+                    case 'updateRecords':
+                        this.$emit('action', {
+                            action: 'update',
+                            data: data
+                        });
+                        break;
+                    case 'deleteRecords':
+                        this.$emit('action', {
+                            action: 'delete',
+                            data: data ? [data] : this.selection
+                        });
+                        break;
+                }
+            },
+            insertRecord() {
+                this.$emit('action', { action: 'insert-dialog' });
             }
         }
     };

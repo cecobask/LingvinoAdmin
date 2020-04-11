@@ -2,7 +2,11 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import firebase from '@/firebase';
 import router from '@/router';
-import { formatPastWotds, formatSelectionWotds, formatQuizData } from '@/helpers'
+import {
+    formatPastWotds,
+    formatQuizData,
+    formatSelectionWotds
+} from '@/helpers';
 
 Vue.use(Vuex);
 
@@ -11,7 +15,10 @@ export default new Vuex.Store({
         user: null,
         authError: null,
         wotds: [],
-        quizData: []
+        quizData: {
+            formatted: [],
+            raw: {}
+        }
     },
     
     mutations: {
@@ -71,7 +78,9 @@ export default new Vuex.Store({
                     loader.hide();
                     commit(
                         'setWotds',
-                        [formatPastWotds(snapshot), formatSelectionWotds(snapshot)].filter(Boolean)
+                        [
+                            formatPastWotds(snapshot),
+                            formatSelectionWotds(snapshot)].filter(Boolean)
                     );
                 });
         },
@@ -82,23 +91,11 @@ export default new Vuex.Store({
                 .once('value')
                 .then(snapshot => {
                     loader.hide();
-                    commit('setQuizData', formatQuizData(snapshot))
+                    commit('setQuizData', {
+                        formatted: formatQuizData(snapshot),
+                        raw: snapshot.val()
+                    });
                 });
-        }
-    },
-    
-    getters: {
-        user(state) {
-            return state.user;
-        },
-        authError(state) {
-            return state.authError;
-        },
-        wotds(state) {
-            return state.wotds;
-        },
-        quizData(state) {
-            return state.quizData;
         }
     }
 });

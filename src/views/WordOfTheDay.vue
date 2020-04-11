@@ -78,7 +78,7 @@
                                     .set(updatedValue);
                             }
                         }
-                        this.$refs.wotdTree.snackbar.visibility = true;
+                        this.$refs.wotdTree.snackbar.visible = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully updated the record/s.';
                         this.$store.dispatch('fetchWotds');
                         break;
@@ -91,7 +91,7 @@
                         firebase.database.ref('wordOfTheDay/selection')
                             .push()
                             .set(data);
-                        this.$refs.wotdTree.snackbar.visibility = true;
+                        this.$refs.wotdTree.snackbar.visible = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully inserted a new WOTD selection entry.';
                         this.wotdNew = '';
                         this.$store.dispatch('fetchWotds')
@@ -104,7 +104,7 @@
                                 .child(id)
                                 .remove()
                         });
-                        this.$refs.wotdTree.snackbar.visibility = true;
+                        this.$refs.wotdTree.snackbar.visible = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully deleted selection.';
                         this.$store.dispatch('fetchWotds')
                         break;
