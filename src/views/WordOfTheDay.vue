@@ -45,6 +45,7 @@
     import { mapState } from 'vuex';
     import TreeView from '@/components/TreeView';
     import firebase from '@/firebase';
+    import { hasJsonStructure } from '@/helpers'
 
     export default {
         name: 'WordOfTheDay',
@@ -112,19 +113,6 @@
             }
         }
     };
-
-    function hasJsonStructure(str) {
-        if (typeof str !== 'string') return false;
-        try {
-            const result = JSON.parse(str);
-            const type = Object.prototype.toString.call(result);
-            return type === '[object Object]'
-                   || type === '[object Array]';
-        }
-        catch (err) {
-            return false;
-        }
-    }
 </script>
 
 <style scoped></style>
