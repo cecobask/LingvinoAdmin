@@ -7,12 +7,47 @@
                         <v-icon class="mx-2">{{ icon }}</v-icon>
                         <v-toolbar-title>{{ title }}</v-toolbar-title>
                         <v-spacer/>
-                        <v-icon class="mx-2" @click="expanded = []">mdi-collapse-all</v-icon>
-                        <v-icon class="mx-2" @click="triggerMultiSelect">mdi-clipboard-check-multiple</v-icon>
+                        <v-tooltip top color="success">
+                            <template #activator="{ on }">
+                                <v-icon class="mx-2" @click="expanded = []" v-on="on">
+                                    mdi-collapse-all
+                                </v-icon>
+                            </template>
+                            <span>Collapse all nodes</span>
+                        </v-tooltip>
+                        <v-tooltip top color="success">
+                            <template #activator="{ on }">
+                                <v-icon class="mx-2" @click="triggerMultiSelect" v-on="on">
+                                    mdi-clipboard-check-multiple
+                                </v-icon>
+                            </template>
+                            <span>Select multiple nodes</span>
+                        </v-tooltip>
                         <v-divider class="mx-5 grey" vertical/>
-                        <v-icon class="mx-2" @click="insertRecord">mdi-plus-box</v-icon>
-                        <v-icon class="mx-2" v-if="selection.length" @click="deleteRecords">mdi-delete</v-icon>
-                        <v-icon class="mx-2" @click="search.visible = !search.visible">mdi-magnify</v-icon>
+                        <v-tooltip top color="success">
+                            <template #activator="{ on }">
+                                <v-icon class="mx-2" @click="insertRecord" v-on="on">
+                                    mdi-plus-box
+                                </v-icon>
+                            </template>
+                            <span>Add new record</span>
+                        </v-tooltip>
+                        <v-tooltip top color="success" v-if="selection.length">
+                            <template #activator="{ on }">
+                                <v-icon class="mx-2" @click="deleteRecords" v-on="on">
+                                    mdi-delete
+                                </v-icon>
+                            </template>
+                            <span>Delete selected nodes</span>
+                        </v-tooltip>
+                        <v-tooltip top color="success">
+                            <template #activator="{ on }">
+                                <v-icon class="mx-2" @click="search.visible = !search.visible" v-on="on">
+                                    mdi-magnify
+                                </v-icon>
+                            </template>
+                            <span>Search the database</span>
+                        </v-tooltip>
                     </v-toolbar>
                     <v-snackbar v-model="snackbar.visible" multi-line>
                         {{ snackbar.text }}
@@ -45,7 +80,7 @@
                                     :items="data"
                                     :search="search.text"
                                     class="overflow-y-auto"
-                                    style="max-height: 70vh"
+                                    style="max-height: 69vh"
                         >
                             <template v-slot:append="{ item }">
                                 <v-menu v-model="actionMenu[item.id]">
