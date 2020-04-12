@@ -14,6 +14,12 @@ Vue.config.productionTip = false;
 Vue.use(Loading, { color: 'red', opacity: 0.3 });
 Vue.use(JsonEditor)
 
+Vue.filter('capitalize', function (value) {
+    if (!value) return ''
+    value = value.toString()
+    return value.charAt(0).toUpperCase() + value.slice(1)
+})
+
 // Handle page reloads.
 let app;
 firebase.auth.onAuthStateChanged(user => {

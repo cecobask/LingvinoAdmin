@@ -1,11 +1,17 @@
 <template>
     <v-container fluid>
-        <tree-view :data="wotds" @action="performAction" :title="title" :icon="icon" ref="wotdTree"/>
-        <v-dialog v-model="insertDialog" max-width="600">
+        <tree-view
+                :data="wotds"
+                @action="performAction"
+                :title="title"
+                :icon="icon"
+                ref="wotdTree"
+        />
+        <v-dialog v-model="insertDialog" max-width="60vw">
             <v-card>
                 <v-toolbar dark color="teal darken-3">
                     <v-spacer/>
-                    <v-toolbar-title class="font-weight-bold">Add new WOTD selection record</v-toolbar-title>
+                    <v-toolbar-title class="font-weight-bold">Add a new WOTD selection record</v-toolbar-title>
                     <v-spacer/>
                     <v-btn icon dark @click="insertDialog = false">
                         <v-icon>mdi-close</v-icon>
@@ -13,18 +19,15 @@
                 </v-toolbar>
                 <v-card-text>
                     <v-container>
-                        <v-row>
-                            <v-col>
-                                <v-text-field v-model="wotdNew"
-                                              label="Word*"
-                                              required
-                                              outlined
-                                              spellcheck="false"
-                                              type="text"
-                                              color="teal darken-4"
-                                ></v-text-field>
-                            </v-col>
-                        </v-row>
+                        <v-text-field v-model="wotdNew"
+                                      label="Word*"
+                                      required
+                                      outlined
+                                      spellcheck="false"
+                                      type="text"
+                                      color="teal darken-4"
+                                      class="mt-3"
+                        />
                     </v-container>
                     <small class="mx-3">* indicates required field</small>
                 </v-card-text>
