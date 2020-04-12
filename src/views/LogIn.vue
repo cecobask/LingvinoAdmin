@@ -21,7 +21,7 @@
                         <v-text-field
                                 v-model="password"
                                 outlined
-                                spellcheck="false"
+                                :spellcheck="false"
                                 :type="showPassword ? 'text' : 'password'"
                                 label="Password"
                                 color="teal darken-4"

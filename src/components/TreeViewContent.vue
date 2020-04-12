@@ -1,6 +1,6 @@
 <template>
             <v-menu v-model="actionMenu[item.id]">
-                <template v-if="item.children" v-slot:activator="{ on }">
+                <template v-slot:activator="{ on }">
                     <v-btn icon v-on="on" @click="clickedItem = item">
                         <v-icon>mdi-dots-vertical</v-icon>
                     </v-btn>
@@ -32,29 +32,22 @@
                                     <v-icon>mdi-close</v-icon>
                                 </v-btn>
                             </v-toolbar>
-                            <v-card-text>
-                                <v-container>
+                            <v-card-text class="grey lighten-4 pb-0 pt-5">
                                     <v-row v-for="(field, index) in item.children" :key="field.id">
-                                        <v-col v-if="clickedItem.children[index]">
-                                            <v-text-field v-if="clickedItem.children[index].label"
-                                                          :label="field.label"
+                                        <v-col>
+                                            <v-text-field v-once
+                                                          :label="field.name === field.value ? 'value' : field.name"
                                                           outlined
-                                                          spellcheck="false"
+                                                          :spellcheck="false"
                                                           type="text"
                                                           color="teal darken-4"
-                                                          v-model="clickedItem.children[index].value"
-                                            ></v-text-field>
-                                            <v-text-field v-else
-                                                          :label="field.name"
-                                                          outlined
-                                                          spellcheck="false"
-                                                          type="text"
-                                                          color="teal darken-4"
+                                                          background-color="white"
+                                                          :append-icon="field.json ? 'mdi-code-json' : null"
+                                                          @click:append="performAction('jsonEdit', field.value)"
                                                           v-model="clickedItem.children[index].value"
                                             ></v-text-field>
                                         </v-col>
                                     </v-row>
-                                </v-container>
                             </v-card-text>
                             <v-divider/>
                             <v-card-actions>
@@ -101,7 +94,7 @@
             closeDialog() {
                 this.$set(this.editDialog, this.clickedItem.id, false);
                 this.$set(this.actionMenu, this.clickedItem.id, false);
-            },
+            }
         }
     };
 </script>

@@ -12,31 +12,38 @@ export function hasJsonStructure(str) {
 }
 
 export function formatQuizData(snapshot) {
-    const topics = []
+    const topics = {
+        id: snapshot.key,
+        name: snapshot.key,
+        value: JSON.stringify(snapshot),
+        json: true,
+        children: []
+    };
     snapshot.forEach(topicSnapshot => {
         const topic = {
-            id: topicSnapshot.key,
+            id: `${topics.id}/${topicSnapshot.key}`,
             name: topicSnapshot.key,
-            value: JSON.stringify(snapshot.child(topicSnapshot.key)),
+            value: JSON.stringify(topicSnapshot),
+            json: true,
             children: []
-        }
+        };
         topicSnapshot.forEach(languageSnapshot => {
-            const languageRef = `${topic.id}/${languageSnapshot.key}`;
             const lang = {
-                id: languageRef,
+                id: `${topic.id}/${languageSnapshot.key}`,
                 name: languageSnapshot.key,
-                value: JSON.stringify(snapshot.child(languageRef)),
+                value: JSON.stringify(languageSnapshot),
+                json: true,
                 children: []
-            }
+            };
             topic.children.push(lang);
             languageSnapshot.forEach(questionSnapshot => {
-                const questionRef = `${lang.id}/${questionSnapshot.key}`;
                 const question = {
-                    id: questionRef,
+                    id: `${lang.id}/${questionSnapshot.key}`,
                     name: questionSnapshot.key,
-                    value: JSON.stringify(snapshot.child(questionRef)),
+                    value: JSON.stringify(questionSnapshot),
+                    json: true,
                     children: []
-                }
+                };
                 lang.children.push(question);
                 questionSnapshot.forEach(answersSnapshot => {
                     const answerRef = `${question.id}/${answersSnapshot.key}`;
@@ -44,36 +51,36 @@ export function formatQuizData(snapshot) {
                         id: answerRef,
                         name: answersSnapshot.key,
                         value: answersSnapshot.val(),
-                        children: [{
-                            id: `${answerRef}/last`,
-                            name: answersSnapshot.val(),
-                            label: answersSnapshot.key,
-                            value: answersSnapshot.val()
-                        }]
-                    }
-                    question.children.push(answers)
-                })
-            })
-        })
-        topics.push(topic);
-    })
-    return topics;
+                        children: [
+                            {
+                                id: `${answerRef}/last`,
+                                name: answersSnapshot.val(),
+                                value: answersSnapshot.val()
+                            }
+                        ]
+                    };
+                    question.children.push(answers);
+                });
+            });
+        });
+        topics.children.push(topic);
+    });
+    
+    return topics.children.length ? topics : null;
 }
 
 export function formatSelectionWotds(snapshot) {
     const wordsSelectionSnap = snapshot.child('selection');
-    const wordsSelection =
-              {
-                  id: 'selection',
-                  name: 'selection',
-                  children: []
-              };
+    const wordsSelection = {
+        id: wordsSelectionSnap.key,
+        name: wordsSelectionSnap.key,
+        children: []
+    };
     wordsSelectionSnap.forEach(word => {
         wordsSelection.children.push(
             {
-                id: `selection/${word.key}`,
+                id: `${wordsSelection.id}/${word.key}`,
                 name: word.val(),
-                label: 'word',
                 value: word.val()
             }
         );
@@ -83,46 +90,44 @@ export function formatSelectionWotds(snapshot) {
 }
 
 export function formatPastWotds(snapshot) {
-    const pastWordsSnap = snapshot.child('past').val();
-    let pastWords =
-            {
-                id: 'past',
-                name: 'past',
-                children: []
+    const pastWordsSnap = snapshot.child('past');
+    const pastWords = {
+        id: pastWordsSnap.key,
+        name: pastWordsSnap.key,
+        children: []
+    };
+    pastWordsSnap.forEach(wordSnap => {
+        const wordRef = `${pastWords.id}/${wordSnap.key}`;
+        const word = {
+            id: wordRef,
+            name: wordSnap.key,
+            value: JSON.stringify(wordSnap),
+            json: true,
+            children: []
+        };
+        wordSnap.forEach(attributeSnap => {
+            const attributeRef = `${wordRef}/${attributeSnap.key}`;
+            const attribute = {
+                id: attributeRef,
+                name: attributeSnap.key,
+                value: attributeSnap.val(),
+                children: [
+                    {
+                        id: `${attributeRef}/last`,
+                        name: attributeSnap.val(),
+                        value: attributeSnap.val()
+                    }
+                ]
             };
-    for (const date in pastWordsSnap) {
-        if (Object.prototype.hasOwnProperty.call(pastWordsSnap, date)) {
-            let word = {
-                id: `past/${date}`,
-                name: date,
-                value: JSON.stringify(snapshot.child(`past/${date}`)),
-                children: []
-            };
-            let values = Object.entries(pastWordsSnap[date]);
-            values.forEach(val => {
-                word.children.push({
-                    id: `past/${date}/${val[0]}`,
-                    name: val[0],
-                    value: val[1],
-                    children: [
-                        {
-                            id: `past/${date}/${val[0]}/last`,
-                            name: val[1],
-                            label: val[0],
-                            value: val[1]
-                        }
-                    ]
-                });
-            });
-            pastWords.children.push(word);
-        }
-    }
+            word.children.push(attribute);
+        });
+        pastWords.children.push(word);
+    });
     
     pastWords.children.sort((a, b) => {
-            const dateStrA = a.name.split('-');
-            const dateStrB = b.name.split('-');
-            return new Date(dateStrA[2], dateStrA[1], dateStrA[0])
-                   - new Date(dateStrB[2], dateStrB[1], dateStrB[0]);
+            const [dateA, monthA, yearA] = a.name.split('-');
+            const [dateB, monthB, yearB] = b.name.split('-');
+            return new Date(yearA, monthA, dateA) - new Date(yearB, monthB, dateB);
         })
         .reverse();
     

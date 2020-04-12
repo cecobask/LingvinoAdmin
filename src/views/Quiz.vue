@@ -7,13 +7,7 @@
                 :icon="icon"
                 ref="quizTree"
         />
-        <vue-json-pretty
-                :data="quizData.raw"
-                :deep="1"
-                :show-length="true"
-                :highlight-mouseover-node="true"
-                :collapsed-on-click-brackets="true"
-        />
+<!--        <json-editor style="background-color: white" :obj-data="quizData.raw" />-->
     </v-content>
 </template>
 
@@ -22,14 +16,10 @@
     import { mapState } from 'vuex';
     import firebase from '@/firebase';
     import { hasJsonStructure } from '@/helpers';
-    import VueJsonPretty from 'vue-json-pretty';
 
     export default {
         name: 'Quiz',
-        components: {
-            TreeView,
-            VueJsonPretty
-        },
+        components: { TreeView },
         computed: mapState(['quizData']),
 
         data() {
@@ -53,13 +43,18 @@
                                 const obj = data.children[child];
                                 const objId = obj.children ? obj.id : obj.id.split('/last')[0];
                                 const updatedValue = hasJsonStructure(obj.value) ? JSON.parse(obj.value) : obj.value;
-                                firebase.database.ref(`quizGame/topics/${objId}`)
+                                firebase.database.ref(`quizGame/${objId}`)
                                     .set(updatedValue);
                             }
                         }
                         this.$refs.quizTree.snackbar.visible = true;
                         this.$refs.quizTree.snackbar.text = 'Successfully updated the record/s.';
                         this.$store.dispatch('fetchQuizData');
+                        break;
+                    }
+                    case 'json': {
+                        console.log(action);
+                        console.log(data);
                         break;
                     }
                     case 'insert-dialog':
@@ -79,7 +74,7 @@
                     case 'delete': {
                         data.forEach(element => {
                             const id = element.id.endsWith('/last') ? element.id.split('/last')[0] : element.id;
-                            firebase.database.ref('quizGame/topics')
+                            firebase.database.ref('quizGame')
                                 .child(id)
                                 .remove();
                         });

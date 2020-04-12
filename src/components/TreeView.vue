@@ -83,7 +83,7 @@
                                     style="max-height: 69vh"
                         >
                             <template v-slot:append="{ item }">
-                                <tree-view-content :item="item" @crud="performAction"/>
+                                <tree-view-content v-if="item" :item="item" @crud="performAction"/>
                             </template>
                         </v-treeview>
                     </v-card-text>
@@ -132,6 +132,12 @@
                     case 'updateRecords':
                         this.$emit('action', {
                             action: 'update',
+                            data: data
+                        });
+                        break;
+                    case 'jsonEdit':
+                        this.$emit('action', {
+                            action: 'json',
                             data: data
                         });
                         break;

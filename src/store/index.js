@@ -92,7 +92,7 @@ export default new Vuex.Store({
                 .then(snapshot => {
                     loader.hide();
                     commit('setQuizData', {
-                        formatted: formatQuizData(snapshot),
+                        formatted: [formatQuizData(snapshot)],
                         raw: snapshot.val()
                     });
                 });

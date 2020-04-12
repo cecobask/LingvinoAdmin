@@ -8,9 +8,11 @@ import '@/firebase';
 import firebase from '@/firebase';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
+import JsonEditor from 'vue-json-edit'
 
 Vue.config.productionTip = false;
 Vue.use(Loading, { color: 'red', opacity: 0.3 });
+Vue.use(JsonEditor)
 
 // Handle page reloads.
 let app;
