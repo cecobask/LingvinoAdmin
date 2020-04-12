@@ -45,7 +45,6 @@
     import { mapState } from 'vuex';
     import TreeView from '@/components/TreeView';
     import firebase from '@/firebase';
-    import { hasJsonStructure } from '@/helpers'
 
     export default {
         name: 'WordOfTheDay',
@@ -69,15 +68,18 @@
             performAction({ action, data }) {
                 switch (action) {
                     case 'update': {
-                        for (const child in data.children) {
-                            if (Object.prototype.hasOwnProperty.call(data.children, child)) {
-                                const obj = data.children[child];
-                                const objId = obj.children ? obj.id : obj.id.split('/last')[0];
-                                const updatedValue = hasJsonStructure(obj.value) ? JSON.parse(obj.value) : obj.value;
-                                firebase.database.ref(`wordOfTheDay/${objId}`)
-                                    .set(updatedValue);
+                        if (data.key) {
+                            firebase.database.ref(`wordOfTheDay/${data.key}`).set(data.value);
+                        } else {
+                            for (const child in data.children) {
+                                if (Object.prototype.hasOwnProperty.call(data.children, child)) {
+                                    const obj = data.children[child];
+                                    const objId = obj.children ? obj.id : obj.id.split('/last')[0];
+                                    firebase.database.ref(`wordOfTheDay/${objId}`).set(obj.value);
+                                }
                             }
                         }
+
                         this.$refs.wotdTree.snackbar.visible = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully updated the record/s.';
                         this.$store.dispatch('fetchWotds');
@@ -94,7 +96,7 @@
                         this.$refs.wotdTree.snackbar.visible = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully inserted a new WOTD selection entry.';
                         this.wotdNew = '';
-                        this.$store.dispatch('fetchWotds')
+                        this.$store.dispatch('fetchWotds');
                         break;
                     }
                     case 'delete': {
@@ -102,11 +104,11 @@
                             const id = element.id.endsWith('/last') ? element.id.split('/last')[0] : element.id;
                             firebase.database.ref('wordOfTheDay')
                                 .child(id)
-                                .remove()
+                                .remove();
                         });
                         this.$refs.wotdTree.snackbar.visible = true;
                         this.$refs.wotdTree.snackbar.text = 'Successfully deleted selection.';
-                        this.$store.dispatch('fetchWotds')
+                        this.$store.dispatch('fetchWotds');
                         break;
                     }
                 }

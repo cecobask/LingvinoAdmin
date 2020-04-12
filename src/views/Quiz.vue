@@ -1,5 +1,5 @@
 <template>
-    <v-content>
+    <v-container fluid>
         <tree-view
                 :data="quizData.formatted"
                 @action="performAction"
@@ -7,15 +7,13 @@
                 :icon="icon"
                 ref="quizTree"
         />
-<!--        <json-editor style="background-color: white" :obj-data="quizData.raw" />-->
-    </v-content>
+    </v-container>
 </template>
 
 <script>
     import TreeView from '@/components/TreeView';
     import { mapState } from 'vuex';
     import firebase from '@/firebase';
-    import { hasJsonStructure } from '@/helpers';
 
     export default {
         name: 'Quiz',
@@ -38,23 +36,20 @@
             performAction({ action, data }) {
                 switch (action) {
                     case 'update': {
-                        for (const child in data.children) {
-                            if (Object.prototype.hasOwnProperty.call(data.children, child)) {
-                                const obj = data.children[child];
-                                const objId = obj.children ? obj.id : obj.id.split('/last')[0];
-                                const updatedValue = hasJsonStructure(obj.value) ? JSON.parse(obj.value) : obj.value;
-                                firebase.database.ref(`quizGame/${objId}`)
-                                    .set(updatedValue);
+                        if (data.key) {
+                            firebase.database.ref(`quizGame/${data.key}`).set(data.value);
+                        } else {
+                            for (const child in data.children) {
+                                if (Object.prototype.hasOwnProperty.call(data.children, child)) {
+                                    const obj = data.children[child];
+                                    const objId = obj.children ? obj.id : obj.id.split('/last')[0];
+                                    firebase.database.ref(`quizGame/${objId}`).set(obj.value);
+                                }
                             }
                         }
                         this.$refs.quizTree.snackbar.visible = true;
                         this.$refs.quizTree.snackbar.text = 'Successfully updated the record/s.';
                         this.$store.dispatch('fetchQuizData');
-                        break;
-                    }
-                    case 'json': {
-                        console.log(action);
-                        console.log(data);
                         break;
                     }
                     case 'insert-dialog':
