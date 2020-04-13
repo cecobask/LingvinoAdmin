@@ -48,16 +48,9 @@ const routes = [
         name: 'User Management',
         meta: {
             authRequired: true
-        }
-        // component: () => import('@/views/UserManagement')
+        },
+        component: () => import('@/views/UserManagement')
     }
-    // {
-    //     path: '*',
-    //     redirect: '/login',
-    //     meta: {
-    //         authRequired: true
-    //     }
-    // }
 ];
 
 const router = new VueRouter({

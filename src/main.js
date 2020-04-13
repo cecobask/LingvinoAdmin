@@ -4,7 +4,6 @@ import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
 import '@babel/polyfill';
-import '@/firebase';
 import firebase from '@/firebase';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
