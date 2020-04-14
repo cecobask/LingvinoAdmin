@@ -42,14 +42,23 @@ export default new Vuex.Store({
     },
     
     actions: {
-        loginAction({ commit }, payload) {
+        loginAction({ commit, dispatch }, payload) {
             const loader = Vue.$loading.show();
             firebase.auth
                 .signInWithEmailAndPassword(payload.email, payload.password)
-                .then(async res => {
-                    commit('setUser', res.user.uid);
-                    commit('setAuthError', null);
-                    await router.replace('/');
+                .then(res => {
+                    firebase.database.ref(`users/${res.user.uid}`)
+                        .once('value')
+                        .then(async userData => {
+                            if (userData.child('admin').val()) {
+                                commit('setUser', res.user.uid);
+                                commit('setAuthError', null);
+                                await router.replace('/');
+                            } else {
+                                dispatch('logoutAction', {loginOut: true})
+                                commit('setAuthError', 'This user is not an admin.');
+                            }
+                        });
                     loader.hide();
                 })
                 .catch(err => {
@@ -58,19 +67,19 @@ export default new Vuex.Store({
                         commit('setAuthError', err.message);
                 });
         },
-        logoutAction({ commit }) {
+        logoutAction({ commit }, payload) {
             const loader = Vue.$loading.show();
             firebase.auth
                 .signOut()
                 .then(async () => {
                     commit('setUser', null);
-                    commit('setAuthError', null);
+                    if (!payload.loginOut) commit('setAuthError', null);
                     await router.replace('/login');
                     loader.hide();
                 })
                 .catch(err => {
                     loader.hide();
-                    if (err.code.startsWith('auth'))
+                    if (err.code && err.code.startsWith('auth'))
                         commit('setAuthError', err.message);
                 });
         },

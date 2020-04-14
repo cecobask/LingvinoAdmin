@@ -1,22 +1,22 @@
 <template>
     <span>
         <v-navigation-drawer
-            app
-            color="teal darken-4"
-            v-if="user"
-            v-model="drawer"
-            disable-route-watcher
-            :mini-variant="$vuetify.breakpoint.smAndDown"
-            temporary
-            dark
+                app
+                color="teal darken-4"
+                v-if="user"
+                v-model="drawer"
+                disable-route-watcher
+                :mini-variant="$vuetify.breakpoint.smAndDown"
+                temporary
+                dark
         >
             <v-list nav dense>
                 <v-list-item-group>
                     <template v-for="item in drawerItems">
                         <v-list-item
-                            :key="item.route"
-                            :to="item.route"
-                            @click="drawer = false"
+                                :key="item.route"
+                                :to="item.route"
+                                @click="drawer = false"
                         >
                             <v-list-item-icon>
                                 <v-icon>{{ item.icon }}</v-icon>
@@ -39,32 +39,32 @@
         </v-navigation-drawer>
         <v-app-bar app color="teal darken-4" dark>
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-            <v-spacer class="hidden-md-and-up" />
+            <v-spacer class="hidden-md-and-up"/>
             <v-toolbar-title>
                 <router-link
-                    to="/"
-                    style="color: white; text-decoration: none; font-weight: bold"
+                        to="/"
+                        style="color: white; text-decoration: none; font-weight: bold"
                 >
                     {{ appTitle }}
                 </router-link>
             </v-toolbar-title>
-            <v-spacer class="hidden-sm-and-down" />
+            <v-spacer class="hidden-sm-and-down"/>
             <v-btn
-                v-if="!user"
-                class="hidden-sm-and-down"
-                to="/login"
-                outlined
-                replace
+                    v-if="!user"
+                    class="hidden-sm-and-down"
+                    to="/login"
+                    outlined
+                    replace
             >
                 <v-icon class="pr-2">mdi-login-variant</v-icon>
                 Log in
             </v-btn>
             <v-btn
-                v-else
-                class="hidden-sm-and-down"
-                @click="logout"
-                outlined
-                replace
+                    v-else
+                    class="hidden-sm-and-down"
+                    @click="logout"
+                    outlined
+                    replace
             >
                 <v-icon class="pr-2">mdi-logout-variant</v-icon>
                 Log out
@@ -77,53 +77,53 @@
     import { mapState } from 'vuex';
 
     export default {
-    name: 'AppNavigation',
-    data() {
-        return {
-            appTitle: 'Lingvino Admin',
-            drawer: false,
-            drawerItems: [
-                {
-                    title: 'Home',
-                    icon: 'mdi-home',
-                    route: '/'
-                },
-                {
-                    title: 'Word of the day',
-                    icon: '$wotd',
-                    route: '/wotd'
-                },
-                {
-                    title: 'Translator',
-                    icon: '$translator',
-                    route: '/translator'
-                },
-                {
-                    title: 'Quiz game',
-                    icon: '$quiz',
-                    route: '/quiz'
-                },
-                {
-                    title: 'User management',
-                    icon: '$userManagement',
-                    route: '/users'
-                }
-            ]
-        };
-    },
+        name: 'AppNavigation',
+        data() {
+            return {
+                appTitle: 'Lingvino Admin',
+                drawer: false,
+                drawerItems: [
+                    {
+                        title: 'Home',
+                        icon: 'mdi-home',
+                        route: '/'
+                    },
+                    {
+                        title: 'Word of the day',
+                        icon: '$wotd',
+                        route: '/wotd'
+                    },
+                    {
+                        title: 'Translator',
+                        icon: '$translator',
+                        route: '/translator'
+                    },
+                    {
+                        title: 'Quiz game',
+                        icon: '$quiz',
+                        route: '/quiz'
+                    },
+                    {
+                        title: 'User management',
+                        icon: '$userManagement',
+                        route: '/users'
+                    }
+                ]
+            };
+        },
 
-    methods: {
-        logout() {
-            this.$store.dispatch('logoutAction');
+        methods: {
+            logout() {
+                this.$store.dispatch('logoutAction', { loginOut: false });
+            }
+        },
+
+        computed: mapState(['user']),
+
+        mounted() {
+            this.$root.$on('authenticated', bool => {
+                this.drawer = bool;
+            });
         }
-    },
-
-    computed: mapState(['user']),
-
-    mounted() {
-        this.$root.$on('authenticated', bool => {
-            this.drawer = bool;
-        });
-    }
-};
+    };
 </script>
