@@ -1,5 +1,40 @@
 <template>
     <v-container>
+        <v-dialog v-model="passwordDialog.visible" max-width="60vw">
+            <v-card>
+                <v-toolbar dark color="teal darken-3">
+                    <v-spacer/>
+                    <v-toolbar-title class="font-weight-bold">Choose a new account password</v-toolbar-title>
+                    <v-spacer/>
+                    <v-btn icon dark @click="resolveDialog('password', false)">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-card-text>
+                    <v-container>
+                        <v-text-field v-model="passwordDialog.password"
+                                      label="New Password*"
+                                      required
+                                      outlined
+                                      spellcheck="false"
+                                      type="password"
+                                      color="teal darken-4"
+                                      class="mt-3"
+                        />
+                    </v-container>
+                    <small class="mx-3">* indicates required field</small>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="teal"
+                           class="ma-auto white--text"
+                           :disabled="!passwordDialog.password"
+                           @click="resolveDialog('password', true)"
+                    >
+                        Update
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-card max-width="90vw" class="my-3 elevation-10">
             <v-toolbar color="blue-grey darken-3" dark flat>
                 <v-icon class="mx-2">$userManagement</v-icon>
@@ -33,12 +68,15 @@
                         clearable
                         clear-icon="mdi-close-circle-outline"
                         class="mb-3"
-                ></v-text-field>
+                />
                 <v-data-table :headers="headers"
                               :items="accounts"
                               :items-per-page="10"
                               :search="search.text"
                 >
+                    <template v-slot:item.email="{ item }">
+                        <span :class="item.disabled ? 'grey--text' : ''">{{item.email}}</span>
+                    </template>
                     <template v-slot:item.providerData="{ item }">
                         <v-icon v-for="(icon, index) in providerIcons(item)" :key="index" class="mx-1">{{icon}}</v-icon>
                     </template>
@@ -48,10 +86,37 @@
                     <template v-slot:item.metadata.lastSignInTime="{ item }">
                         <span>{{item.metadata.lastSignInTime | formattedDate}}</span>
                     </template>
+                    <template v-slot:item.options="{ item }">
+                        <v-menu offset-y>
+                            <template v-slot:activator="{ on }">
+                                <v-btn v-on="on" icon class="">
+                                    <v-icon>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item @click="openDialog('password', item.uid)">
+                                    <v-list-item-title>Update password</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item @click="disableEnableAccount(item)">
+                                    <v-list-item-title>
+                                        {{item.disabled ? 'Enable account' : 'Disable account'}}
+                                    </v-list-item-title>
+                                </v-list-item>
+                                <v-list-item @click="deleteAccount(item)">
+                                    <v-list-item-title>Delete account</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </template>
                 </v-data-table>
             </v-card-text>
         </v-card>
-
+        <v-snackbar v-model="snackbar.visible" multi-line>
+            {{ snackbar.text }}
+            <v-btn color="pink" text @click="snackbar.visible = false">
+                Close
+            </v-btn>
+        </v-snackbar>
     </v-container>
 </template>
 
@@ -82,21 +147,36 @@
                         text: 'Created',
                         value: 'metadata.creationTime',
                         sort: (a, b) => {
-                            return Date.parse(a) - Date.parse(b)
+                            return Date.parse(a) - Date.parse(b);
                         }
                     },
                     {
                         text: 'Signed in',
                         value: 'metadata.lastSignInTime',
                         sort: (a, b) => {
-                            return Date.parse(a) - Date.parse(b)
+                            return Date.parse(a) - Date.parse(b);
                         }
                     },
                     {
                         text: 'User UID',
                         value: 'uid'
+                    },
+                    {
+                        value: 'options',
+                        sortable: false
                     }
-                ]
+                ],
+                passwordDialog: {
+                    password: '',
+                    visible: false,
+                    resolve: null,
+                    reject: null,
+                    uid: ''
+                },
+                snackbar: {
+                    visible: false,
+                    text: ''
+                }
             };
         },
         mounted() {
@@ -104,10 +184,76 @@
         },
         methods: {
             getAllAccounts() {
+                const loader = this.$loading.show();
                 const getAllAccounts = firebase.functions.httpsCallable('userManagement');
                 getAllAccounts({ action: 'getAllAccounts' })
                     .then(result => {
                         this.accounts = result.data.users;
+                        loader.hide();
+                    });
+            },
+            disableEnableAccount(account) {
+                const loader = this.$loading.show();
+                const updateAccount = firebase.functions.httpsCallable('userManagement');
+                updateAccount({
+                    action: 'updateAccount',
+                    uid: account.uid,
+                    updateField: { disabled: !account.disabled }
+                })
+                    .then(result => {
+                        this.accounts = result.data.allUsers.users;
+                        this.showSnackbar(
+                            `Successfully ${result.data.updatedUser.disabled ? 'disabled' : 'enabled'} the account.`
+                        );
+                        loader.hide();
+                    });
+            },
+            deleteAccount(account) {
+                const loader = this.$loading.show();
+                const deleteAccount = firebase.functions.httpsCallable('userManagement');
+                deleteAccount({
+                    action: 'deleteAccount',
+                    uid: account.uid
+                })
+                    .then(result => {
+                        this.accounts = result.data.allUsers.users;
+                        this.showSnackbar('Successfully deleted the account.');
+                        loader.hide();
+                    });
+            },
+            openDialog(dialogName, uid) {
+                switch (dialogName) {
+                    case 'password':
+                        this.passwordDialog.visible = true;
+                        this.passwordDialog.uid = uid;
+                        return new Promise((resolve, reject) => {
+                            this.passwordDialog.resolve = resolve;
+                            this.passwordDialog.reject = reject;
+                        });
+                }
+            },
+            resolveDialog(dialogName, result) {
+                switch (dialogName) {
+                    case 'password':
+                        this.passwordDialog.resolve(result);
+                        this.passwordDialog.visible = false;
+                        this.passwordDialog.password = '';
+                        if (result) this.updateAccountPassword(this.passwordDialog.uid);
+                        break;
+                }
+            },
+            updateAccountPassword(uid) {
+                const loader = this.$loading.show();
+                const updateAccount = firebase.functions.httpsCallable('userManagement');
+                updateAccount({
+                    action: 'updateAccount',
+                    uid: uid,
+                    updateField: { password: this.passwordDialog.password }
+                })
+                    .then(result => {
+                        this.accounts = result.data.allUsers.users;
+                        this.showSnackbar('Successfully updated the account\'s password.');
+                        loader.hide();
                     });
             },
             providerIcons(user) {
@@ -121,19 +267,28 @@
                             return '$email';
                     }
                 });
+            },
+            showSnackbar(text) {
+                this.snackbar.visible = true;
+                this.snackbar.text = text;
             }
         },
         filters: {
             formattedDate: function(dateString) {
                 const date = new Date(Date.parse(dateString));
-                const day = date.getDate().toString().length === 1 ? '0' + date.getDate() : date.getDate();
-                const month = date.getMonth().toString().length === 1 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+                const day = date.getDate()
+                                .toString().length === 1 ? '0' + date.getDate() : date.getDate();
+                const month = date.getMonth()
+                                  .toString().length === 1 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
                 const year = date.getFullYear();
-                const hours = date.getHours().toString().length === 1 ? '0' + date.getHours() : date.getHours();
-                const minutes = date.getMinutes().toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
-                const seconds = date.getSeconds().toString().length === 1 ? '0' + date.getSeconds() : date.getSeconds();
+                const hours = date.getHours()
+                                  .toString().length === 1 ? '0' + date.getHours() : date.getHours();
+                const minutes = date.getMinutes()
+                                    .toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
+                const seconds = date.getSeconds()
+                                    .toString().length === 1 ? '0' + date.getSeconds() : date.getSeconds();
 
-                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} GMT`
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} GMT`;
             }
         }
     };
