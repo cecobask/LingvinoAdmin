@@ -53,26 +53,26 @@ export default {
                 {
                     title: 'Word of the Day',
                     icon: '/assets/wotd.svg',
-                    description: 'Add new words. Manage existing ones.',
+                    description: 'Add new words and manage existing ones.',
                     route: '/wotd'
                 },
                 {
                     title: 'Translator',
                     icon: '/assets/translator.svg',
-                    description: 'TBA',
+                    description: 'Manage all users\' translator collections.',
                     route: '/translator'
                 },
                 {
                     title: 'Quiz Game',
                     icon: '/assets/quiz.svg',
                     description:
-                        'Add new quiz questions and topics. Manage existing ones.',
+                        'Add new quiz questions/topics and manage existing ones.',
                     route: '/quiz'
                 },
                 {
                     title: 'User Management',
                     icon: '/assets/user-management.svg',
-                    description: 'Revoke user access. Delete users.',
+                    description: 'Revoke user access, update user passwords, delete and create users.',
                     route: '/users'
                 }
             ]

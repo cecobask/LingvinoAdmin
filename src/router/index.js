@@ -32,8 +32,8 @@ const routes = [
         name: 'Translator',
         meta: {
             authRequired: true
-        }
-        // component: () => import('@/views/Translator')
+        },
+        component: () => import('@/views/Translator')
     },
     {
         path: '/quiz',
@@ -50,6 +50,10 @@ const routes = [
             authRequired: true
         },
         component: () => import('@/views/UserManagement')
+    },
+    {
+        path: '*',
+        redirect: '/'
     }
 ];
 

@@ -30,7 +30,7 @@
         </v-dialog>
         <v-menu v-model="actionMenu[item.id]">
             <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click="clickedItem = item">
+                <v-btn v-if="!item.id.endsWith('/last')" icon v-on="on" @click="clickedItem = item">
                     <v-icon>mdi-dots-vertical</v-icon>
                 </v-btn>
             </template>

@@ -5,7 +5,8 @@ import router from '@/router';
 import {
     formatPastWotds,
     formatQuizData,
-    formatSelectionWotds
+    formatSelectionWotds,
+    formatTranslatorData
 } from '@/helpers';
 
 Vue.use(Vuex);
@@ -18,7 +19,8 @@ export default new Vuex.Store({
         quizData: {
             formatted: [],
             raw: {}
-        }
+        },
+        translatorData: []
     },
     
     mutations: {
@@ -33,6 +35,9 @@ export default new Vuex.Store({
         },
         setQuizData(state, payload) {
             state.quizData = payload;
+        },
+        setTranslatorData(state, payload) {
+            state.translatorData = payload;
         }
     },
     
@@ -80,7 +85,8 @@ export default new Vuex.Store({
                         'setWotds',
                         [
                             formatPastWotds(snapshot),
-                            formatSelectionWotds(snapshot)].filter(Boolean)
+                            formatSelectionWotds(snapshot)
+                        ].filter(Boolean)
                     );
                 });
         },
@@ -95,6 +101,16 @@ export default new Vuex.Store({
                         formatted: [formatQuizData(snapshot)],
                         raw: snapshot.val()
                     });
+                });
+        },
+        fetchTranslatorData({ commit }) {
+            const loader = Vue.$loading.show();
+            firebase.database
+                .ref('users')
+                .once('value')
+                .then(snapshot => {
+                    loader.hide();
+                    commit('setTranslatorData', formatTranslatorData(snapshot));
                 });
         }
     }

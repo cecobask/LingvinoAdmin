@@ -22,7 +22,7 @@
                     <span>Select multiple nodes</span>
                 </v-tooltip>
                 <v-divider class="mx-5 grey" vertical/>
-                <v-tooltip top color="success">
+                <v-tooltip v-if="icon !== '$translator'" top color="success">
                     <template #activator="{ on }">
                         <v-icon class="mx-2" @click="insertRecord" v-on="on">
                             mdi-plus-box
@@ -131,17 +131,12 @@
                             data: data
                         });
                         break;
-                    case 'jsonEdit':
-                        this.$emit('action', {
-                            action: 'json',
-                            data: data
-                        });
-                        break;
                     case 'deleteRecords':
                         this.$emit('action', {
                             action: 'delete',
                             data: data ? [data] : this.selection
                         });
+                        this.selection = [];
                         break;
                 }
             },

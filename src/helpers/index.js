@@ -133,3 +133,57 @@ export function formatPastWotds(snapshot) {
     
     return pastWords.children.length ? pastWords : null;
 }
+
+export function formatTranslatorData(snapshot) {
+    const users = [];
+    snapshot.forEach(userSnapshot => {
+        const translatorCollections = userSnapshot.child('translatorCollections');
+        const user = {
+            id: userSnapshot.key,
+            name: userSnapshot.key,
+            children: [{
+                id: `${userSnapshot.key}/translatorCollections`,
+                name: 'translatorCollections',
+                value: JSON.stringify(translatorCollections),
+                json: true,
+                children: []
+            }]
+        }
+        translatorCollections.forEach(collectionSnapshot => {
+            const collection = {
+                id: `${user.children[0].id}/${collectionSnapshot.key}`,
+                name: collectionSnapshot.key,
+                value: JSON.stringify(collectionSnapshot),
+                json: true,
+                children: []
+            }
+            collectionSnapshot.forEach(translationSnapshot => {
+                const translation = {
+                    id: `${collection.id}/${translationSnapshot.key}`,
+                    name: translationSnapshot.key,
+                    value: JSON.stringify(translationSnapshot),
+                    json: true,
+                    children: []
+                }
+                translationSnapshot.forEach(attributeSnapshot => {
+                    const attributeRef = `${translation.id}/${attributeSnapshot.key}`;
+                    const attribute = {
+                        id: attributeRef,
+                        name: attributeSnapshot.key,
+                        value: attributeSnapshot.val(),
+                        children: [{
+                            id: `${attributeRef}/last`,
+                            name: attributeSnapshot.val(),
+                            value: attributeSnapshot.val()
+                        }]
+                    }
+                    translation.children.push(attribute);
+                })
+                collection.children.push(translation);
+            })
+            user.children[0].children.push(collection);
+        })
+        users.push(user);
+    })
+    return users.length ? users : null;
+}
