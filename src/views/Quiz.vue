@@ -58,7 +58,7 @@
                 <v-card-actions>
                     <v-btn color="teal"
                            class="ma-auto white--text my-3"
-                           :disabled="newJson === undefined"
+                           :disabled="newJson === undefined || JSON.stringify(newJson) === '{}'"
                            @click="performAction({ action: 'insertQuizData', data: newJson })"
                     >
                         Save
@@ -128,6 +128,7 @@
                     }
                     case 'insert-dialog':
                         this.insertDialog = true;
+                        this.topics = [];
                         firebase.database.ref('quizGame/topics')
                             .once('value')
                             .then(topicsSnapshot => {
