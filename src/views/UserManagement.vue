@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-dialog v-model="passwordDialog.visible" max-width="60vw">
+        <v-dialog v-model="passwordDialog.visible" max-width="40vw">
             <v-card>
                 <v-toolbar dark color="teal darken-3">
                     <v-spacer/>
@@ -10,7 +10,7 @@
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text>
+                <v-card-text class="grey lighten-4">
                     <v-container>
                         <v-text-field v-model="passwordDialog.password"
                                       label="New Password*"
@@ -18,6 +18,7 @@
                                       outlined
                                       spellcheck="false"
                                       type="password"
+                                      background-color="white"
                                       color="teal darken-4"
                                       class="mt-3"
                         />
@@ -26,11 +27,62 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-btn color="teal"
-                           class="ma-auto white--text"
+                           class="ma-auto my-3 white--text"
                            :disabled="!passwordDialog.password"
                            @click="resolveDialog('password', true)"
                     >
                         Update
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="userDialog.visible" max-width="45vw">
+            <v-card>
+                <v-toolbar dark color="teal darken-3">
+                    <v-spacer/>
+                    <v-toolbar-title class="font-weight-bold">Create a new email / password account</v-toolbar-title>
+                    <v-spacer/>
+                    <v-btn icon dark @click="resolveDialog('user', false)">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-card-text class="grey lighten-4">
+                    <v-container>
+                        <v-form ref="userForm" class="mt-3" v-model="userDialog.valid" lazy-validation>
+                            <v-text-field
+                                    v-model="userDialog.email"
+                                    outlined
+                                    clearable
+                                    :spellcheck="false"
+                                    label="Email"
+                                    color="teal darken-4"
+                                    background-color="white"
+                                    prepend-inner-icon="mdi-account-circle"
+                                    :rules="userDialog.rules.email"
+                            />
+                            <v-text-field
+                                    v-model="userDialog.password"
+                                    outlined
+                                    :spellcheck="false"
+                                    :type="userDialog.showPassword ? 'text' : 'password'"
+                                    label="Password"
+                                    color="teal darken-4"
+                                    background-color="white"
+                                    prepend-inner-icon="mdi-lock"
+                                    :append-icon="userDialog.showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                                    @click:append="userDialog.showPassword = !userDialog.showPassword"
+                                    :rules="userDialog.rules.password"
+                            />
+                        </v-form>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="teal"
+                           class="ma-auto my-3 white--text"
+                           :disabled="!userDialog.valid || !userDialog.password.length || !userDialog.email.length"
+                           @click="resolveDialog('user', true)"
+                    >
+                        Create
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -42,7 +94,7 @@
                 <v-spacer/>
                 <v-tooltip top color="success">
                     <template #activator="{ on }">
-                        <v-icon class="mx-2" v-on="on">
+                        <v-icon class="mx-2" @click="openDialog('user')" v-on="on">
                             mdi-plus-box
                         </v-icon>
                     </template>
@@ -139,7 +191,7 @@
                         value: 'email'
                     },
                     {
-                        text: 'Providers',
+                        text: 'Auth Providers',
                         value: 'providerData',
                         sortable: false
                     },
@@ -151,7 +203,7 @@
                         }
                     },
                     {
-                        text: 'Signed in',
+                        text: 'Signed In',
                         value: 'metadata.lastSignInTime',
                         sort: (a, b) => {
                             return Date.parse(a) - Date.parse(b);
@@ -163,7 +215,8 @@
                     },
                     {
                         value: 'options',
-                        sortable: false
+                        sortable: false,
+                        align: 'end'
                     }
                 ],
                 passwordDialog: {
@@ -172,6 +225,25 @@
                     resolve: null,
                     reject: null,
                     uid: ''
+                },
+                userDialog: {
+                    visible: false,
+                    valid: false,
+                    email: '',
+                    password: '',
+                    showPassword: false,
+                    rules: {
+                        email: [
+                            v => !!v || 'E-mail is required',
+                            v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+                            v => !this.accounts.some(account => account.email === v) ||
+                                 'Account with this email already exists.'
+                        ],
+                        password: [
+                            v => !!v || 'Password is required',
+                            v => v.length >= 6 || 'Password must be at least 6 characters long.'
+                        ]
+                    }
                 },
                 snackbar: {
                     visible: false,
@@ -230,6 +302,9 @@
                             this.passwordDialog.resolve = resolve;
                             this.passwordDialog.reject = reject;
                         });
+                    case 'user':
+                        this.userDialog.visible = true;
+
                 }
             },
             resolveDialog(dialogName, result) {
@@ -240,6 +315,10 @@
                         this.passwordDialog.password = '';
                         if (result) this.updateAccountPassword(this.passwordDialog.uid);
                         break;
+                    case 'user':
+                        this.userDialog.visible = false;
+                        if (result) this.createAccount(this.userDialog.email, this.userDialog.password);
+                        else this.clearForm();
                 }
             },
             updateAccountPassword(uid) {
@@ -271,6 +350,33 @@
             showSnackbar(text) {
                 this.snackbar.visible = true;
                 this.snackbar.text = text;
+            },
+            clearForm() {
+                this.userDialog.email = '';
+                this.userDialog.password = '';
+                this.$refs.userForm.resetValidation();
+            },
+            validate() {
+                return this.$refs.userForm.validate();
+            },
+            createAccount(email, password) {
+                if (this.validate()) {
+                    const loader = this.$loading.show();
+                    const createAccount = firebase.functions.httpsCallable('userManagement');
+                    createAccount({
+                        action: 'createAccount',
+                        userObject: {
+                            email: email,
+                            password: password
+                        }
+                    })
+                        .then(result => {
+                            this.accounts = result.data.allUsers.users;
+                            this.showSnackbar('Successfully created user account.');
+                            this.clearForm();
+                            loader.hide();
+                        });
+                }
             }
         },
         filters: {
@@ -288,7 +394,7 @@
                 const seconds = date.getSeconds()
                                     .toString().length === 1 ? '0' + date.getSeconds() : date.getSeconds();
 
-                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} GMT`;
+                if (dateString) return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} GMT`;
             }
         }
     };

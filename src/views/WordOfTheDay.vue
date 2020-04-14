@@ -23,7 +23,7 @@
                                       label="Word*"
                                       required
                                       outlined
-                                      spellcheck="false"
+                                      :spellcheck="false"
                                       type="text"
                                       color="teal darken-4"
                                       class="mt-3"
@@ -32,8 +32,9 @@
                     <small class="mx-3">* indicates required field</small>
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn dark color="teal"
-                           class="ma-auto"
+                    <v-btn color="teal"
+                           class="ma-auto my-3 white--text"
+                           :disabled="!wotdNew"
                            @click="performAction({ action: 'insert-wotd', data: wotdNew })"
                     >
                         Save

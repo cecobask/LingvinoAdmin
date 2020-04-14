@@ -11,7 +11,7 @@
                                 v-model="email"
                                 outlined
                                 clearable
-                                spellcheck="false"
+                                :spellcheck="false"
                                 label="Email"
                                 color="teal darken-4"
                                 background-color="grey lighten-5"
@@ -68,7 +68,7 @@
                         v => !!v || 'E-mail is required',
                         v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
                     ],
-                    password: [v => !!v || 'Password is Required']
+                    password: [v => !!v || 'Password is required']
                 }
             };
         },

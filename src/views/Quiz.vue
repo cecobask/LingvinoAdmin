@@ -17,7 +17,7 @@
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </v-toolbar>
-                <v-card-text>
+                <v-card-text class="grey lighten-4">
                     <v-container>
                         <v-row align="center" justify="center" class="mb-3">
                             <v-btn-toggle v-model="jsonType" mandatory class="mx-3">
@@ -50,14 +50,14 @@
                                     :plus="false"
                                     :options="jsonOptions"
                                     @error="onJsonError"
-                                    height="60vh"
+                                    height="55vh"
                             />
                         </v-row>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn color="teal"
-                           class="ma-auto white--text mb-3"
+                           class="ma-auto white--text my-3"
                            :disabled="newJson === undefined"
                            @click="performAction({ action: 'insertQuizData', data: newJson })"
                     >

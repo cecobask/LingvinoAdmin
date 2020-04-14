@@ -81,7 +81,7 @@
                         <v-divider/>
                         <v-card-actions>
                             <v-btn dark color="teal"
-                                   class="ma-auto"
+                                   class="ma-auto my-3"
                                    @click="performAction('updateRecords', clickedItem)"
                             >
                                 Save
