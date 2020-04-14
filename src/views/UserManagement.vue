@@ -42,6 +42,12 @@
                     <template v-slot:item.providerData="{ item }">
                         <v-icon v-for="(icon, index) in providerIcons(item)" :key="index" class="mx-1">{{icon}}</v-icon>
                     </template>
+                    <template v-slot:item.metadata.creationTime="{ item }">
+                        <span>{{item.metadata.creationTime | formattedDate}}</span>
+                    </template>
+                    <template v-slot:item.metadata.lastSignInTime="{ item }">
+                        <span>{{item.metadata.lastSignInTime | formattedDate}}</span>
+                    </template>
                 </v-data-table>
             </v-card-text>
         </v-card>
@@ -74,11 +80,17 @@
                     },
                     {
                         text: 'Created',
-                        value: 'metadata.creationTime'
+                        value: 'metadata.creationTime',
+                        sort: (a, b) => {
+                            return Date.parse(a) - Date.parse(b)
+                        }
                     },
                     {
                         text: 'Signed in',
-                        value: 'metadata.lastSignInTime'
+                        value: 'metadata.lastSignInTime',
+                        sort: (a, b) => {
+                            return Date.parse(a) - Date.parse(b)
+                        }
                     },
                     {
                         text: 'User UID',
@@ -109,6 +121,19 @@
                             return '$email';
                     }
                 });
+            }
+        },
+        filters: {
+            formattedDate: function(dateString) {
+                const date = new Date(Date.parse(dateString));
+                const day = date.getDate().toString().length === 1 ? '0' + date.getDate() : date.getDate();
+                const month = date.getMonth().toString().length === 1 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1);
+                const year = date.getFullYear();
+                const hours = date.getHours().toString().length === 1 ? '0' + date.getHours() : date.getHours();
+                const minutes = date.getMinutes().toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes();
+                const seconds = date.getSeconds().toString().length === 1 ? '0' + date.getSeconds() : date.getSeconds();
+
+                return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} GMT`
             }
         }
     };
