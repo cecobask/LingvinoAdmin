@@ -310,10 +310,10 @@
             resolveDialog(dialogName, result) {
                 switch (dialogName) {
                     case 'password':
+                        if (result) this.updateAccountPassword(this.passwordDialog.uid, this.passwordDialog.password);
                         this.passwordDialog.resolve(result);
                         this.passwordDialog.visible = false;
                         this.passwordDialog.password = '';
-                        if (result) this.updateAccountPassword(this.passwordDialog.uid);
                         break;
                     case 'user':
                         this.userDialog.visible = false;
@@ -321,13 +321,13 @@
                         else this.clearForm();
                 }
             },
-            updateAccountPassword(uid) {
+            updateAccountPassword(uid, password) {
                 const loader = this.$loading.show();
                 const updateAccount = firebase.functions.httpsCallable('userManagement');
                 updateAccount({
                     action: 'updateAccount',
                     uid: uid,
-                    updateField: { password: this.passwordDialog.password }
+                    updateField: { password: password }
                 })
                     .then(result => {
                         this.accounts = result.data.allUsers.users;
