@@ -1,4 +1,4 @@
-# lingvino-admin
+# LingvinoAdmin
 The web application works closely and manages the data of Lingvino Android application. Application
 administrators are not developers, nor they are users. However, their work is critical to keeping an
 application running. A mobile application like Lingvino needs frequent database updates such as
@@ -39,7 +39,7 @@ account passwords, disable/enable, delete and create new user accounts in an eas
 manner.
 
 ## Project setup
-###Install dependencies
+### Install dependencies
 ```
 npm install
 ```
